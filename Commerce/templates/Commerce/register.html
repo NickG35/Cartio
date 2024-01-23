@@ -1,0 +1,12 @@
+{% extends "Commerce/layout.html" %}
+
+{% block body %}
+    <form action="{% url 'register' %}">
+        <input type="text" name="email" placeholder="email">
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="password" name="confirmation" placeholder="confirm password">
+        <input type="submit" value="Register">
+    </form>
+    <p>Already a user?<a href="{% url 'login' %}">Login</a></p>
+{% endblock %}

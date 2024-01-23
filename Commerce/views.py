@@ -3,10 +3,11 @@ from django.db import IntegrityError
 from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
+from .models import User
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'Commerce/index.html')
 
 def register(request):
      if request.method == "POST":
@@ -15,7 +16,7 @@ def register(request):
           password = request.POST["password"]
           confirmation = request.POST["confirmation"]
           if password != confirmation:
-               return render(request, "register.html", {
+               return render(request, "Commerce/register.html", {
                     "message": "Passwords do not match"
                })
           
@@ -23,15 +24,15 @@ def register(request):
                user = User.objects.create_user(username, email, password)
                user.save()
           except IntegrityError:
-               return render(request, "register.html", {
+               return render(request, "Commerce/register.html", {
                     "messagey": "Username already taken."
                })
           login(request, user)
           return HttpResponseRedirect(reverse("index"))
      else:
-          return render(request,"register.html")
+          return render(request,"Commerce/register.html")
 
-def login(request):
+def login_view(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -40,12 +41,12 @@ def login(request):
             login(request, user)
             return HttpResponseRedirect(reverse("index"))
         else:
-            return render(request, "login.html", {
+            return render(request, "Commerce/login.html", {
                 "message": "Invalid username and/or password."
             })
     else:
-        return render(request, "login.html")
+        return render(request, "Commerce/login.html")
 
-def logout(request):
+def logout_view(request):
      logout(request)
-     return render(request, "login.html")
+     return render(request, "Commerce/login.html")

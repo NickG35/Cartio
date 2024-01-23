@@ -1,7 +1,7 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <h1 class="heading">Register</h1>
+    <h1 class="center-text">Register</h1>
     <form action="{% url 'register' %}" method="post">
         {% csrf_token %}
         <div class="mb-3">
@@ -21,7 +21,11 @@
             <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
             <input type="password" name="confirmation" class="form-control" id="exampleInputPassword1">
           </div>
-        <button type="submit" class="btn btn-primary">Register</button>
+        <div class="center-text">
+            <button type="submit" class="btn btn-primary">Register</button>
+        </div>
       </form>
-    <p>Already a user?<a href="{% url 'login' %}">Login</a></p>
+      <div id="suggestion" class="center-text">
+        <p>Already a user?<a href="{% url 'login' %}">Login</a></p>
+      </div>
 {% endblock %}

@@ -1,7 +1,8 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <form action="{% url 'register' %}">
+    <form action="{% url 'register' %}" method="post">
+        {% csrf_token %}
         <input type="text" name="email" placeholder="email">
         <input type="text" name="username" placeholder="username">
         <input type="password" name="password" placeholder="password">

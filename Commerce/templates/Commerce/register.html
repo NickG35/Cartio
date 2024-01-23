@@ -1,13 +1,27 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
+    <h1 class="heading">Register</h1>
     <form action="{% url 'register' %}" method="post">
         {% csrf_token %}
-        <input type="text" name="email" placeholder="email">
-        <input type="text" name="username" placeholder="username">
-        <input type="password" name="password" placeholder="password">
-        <input type="password" name="confirmation" placeholder="confirm password">
-        <input type="submit" value="Register">
-    </form>
+        <div class="mb-3">
+          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp">
+          <div id="emailHelp" class="form-text">example: johnsmith@gmail.com</div>
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputUsername" class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" id="exampleInputPassword1">
+          </div>
+        <div class="mb-3">
+          <label for="exampleInputPassword1" class="form-label">Password</label>
+          <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+        </div>
+        <div class="mb-3">
+            <label for="exampleInputPassword1" class="form-label">Confirm Password</label>
+            <input type="password" name="confirmation" class="form-control" id="exampleInputPassword1">
+          </div>
+        <button type="submit" class="btn btn-primary">Register</button>
+      </form>
     <p>Already a user?<a href="{% url 'login' %}">Login</a></p>
 {% endblock %}

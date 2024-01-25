@@ -27,7 +27,7 @@ class Listing(models.Model):
     listing_date = models.DateTimeField(blank=False)
     listing_description = models.CharField(max_length = 50, blank=False)
     listing_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    listing_category = models.CharField(max_length=12, choices=categories)
+    listing_category = models.CharField(max_length=12, choices=categories, blank=False)
 
 class Wishlist(models.Model):
     wishlist_user = models.ForeignKey(User, on_delete=models.CASCADE)

@@ -4,10 +4,26 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import User
+from .forms import CreateListing
 
 # Create your views here.
 def index(request):
     return render(request, 'Commerce/index.html')
+
+def create_listing(request):
+     if request.method == "POST":
+          form = CreateListing(request.POST)
+          if form.is_valid():
+               new_listing = form.save(commit=False)
+               new_listing.listing_date = datetime.now()
+               new_listing.listing_user = request.user.username
+               new_listing.save()
+               return HttpResponseRedirect(reverse("index"))
+     else:
+          form = CreateListing         
+          return render(request, 'Commerce/create.html', {
+               'form': form,
+          })
 
 def register(request):
      if request.method == "POST":

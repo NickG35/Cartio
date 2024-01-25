@@ -1,30 +1,33 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import User
+from .models import User, Listing
 from .forms import CreateListing
-import datetime 
+from datetime import datetime 
 
 # Create your views here.
 def index(request):
-    return render(request, 'Commerce/index.html')
+    active_listings = Listing.objects.filter(listing_user=request.user).all()
+    return render(request, 'Commerce/index.html', {
+          'active_listings': active_listings
+    })
 
 def create_listing(request):
      if request.method == "POST":
-          form = CreateListing(request.POST)
+          form = CreateListing(request.POST, request.FILES)
           if form.is_valid():
                new_listing = form.save(commit=False)
-               new_listing.listing_date = datetime.datetime.now()
-               new_listing.listing_user = request.user.username
+               new_listing.listing_date = datetime.now()
+               new_listing.listing_user = request.user
                new_listing.save()
                return HttpResponseRedirect(reverse("index"))
      else:
-          form = CreateListing         
-          return render(request, 'Commerce/create.html', {
-               'form': form,
-          })
+          form = CreateListing()         
+     return render(request, 'Commerce/create.html', {
+          'form': form
+     })
 
 def register(request):
      if request.method == "POST":

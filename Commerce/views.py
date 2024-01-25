@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import User
 from .forms import CreateListing
+import datetime 
 
 # Create your views here.
 def index(request):
@@ -15,7 +16,7 @@ def create_listing(request):
           form = CreateListing(request.POST)
           if form.is_valid():
                new_listing = form.save(commit=False)
-               new_listing.listing_date = datetime.now()
+               new_listing.listing_date = datetime.datetime.now()
                new_listing.listing_user = request.user.username
                new_listing.save()
                return HttpResponseRedirect(reverse("index"))

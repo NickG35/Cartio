@@ -12,6 +12,7 @@ class CreateListing(ModelForm):
         self.fields['listing_name'].label = "Name"
         self.fields['listing_image'].label = "Image"
         self.fields['listing_price'].label = "Price"
+        self.fields['listing_description'].label = "Description"
         self.fields['listing_category'].label = "Category"
         #hide date and user categories
         self.fields['listing_date'].widget = forms.HiddenInput()

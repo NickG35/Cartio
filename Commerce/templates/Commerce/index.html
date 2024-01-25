@@ -5,11 +5,14 @@
         <h1>Welcome!</h1>
         <h2>Active Listings</h2>
         {% for listing in active_listings %}
-            <p>{{ listing.listing_name }}</p>
-            <p>{{ listing.listing_description }}</p>
-            <p>$ {{ listing.listing_price }}</p>
-            <img src='{{ listing.listing_image }}'>
-            <p>created on {{ listing.listing_date }} by <b>{{listing.listing_user}}</b></p>
+            <div class="card" style="width: 18rem;">
+                <img src="/Users/nick/Cartio/Commerce/static/Images/{{ listing.listing_image }}" class="card-img-top" alt="{{listing.listing_name}}">
+                <div class="card-body">
+                    <h5 class="card-title">$ {{ listing.listing_price }}</h5>
+                    <p class="card-text">{{ listing.listing_name }}</p>
+                    <a href="#" class="btn btn-primary">View</a>
+                </div>
+            </div>
         {% endfor %}
     </div>
 {% endblock %}

@@ -2,10 +2,10 @@
 
 {% block body %}
 <h1>Create Listing</h1>
-<form action="" method="post">
+<form enctype="multipart/form-data" action="{% url 'create_listing' %}" method="post">
     {% csrf_token %}
-    {{form }}
-    <button class="btn btn-primary" value="Create"></button>
+    {{ form }}
+    <button class="btn btn-primary" type="submit" value="Create"></button>
 </form>
 
 {% endblock %}

@@ -4,5 +4,12 @@
     <div class="container">
         <h1>Welcome!</h1>
         <h2>Active Listings</h2>
+        {% for listing in active_listings %}
+            <p>{{ listing.listing_name }}</p>
+            <p>{{ listing.listing_description }}</p>
+            <p>$ {{ listing.listing_price }}</p>
+            <img src='{{ listing.listing_image }}'>
+            <p>created on {{ listing.listing_date }} by <b>{{listing.listing_user}}</b></p>
+        {% endfor %}
     </div>
 {% endblock %}

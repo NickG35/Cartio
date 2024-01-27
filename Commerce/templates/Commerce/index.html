@@ -1,12 +1,12 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
+    <h1>Welcome!</h1>
+    <h2>Active Listings</h2>
     <div class="container">
-        <h1>Welcome!</h1>
-        <h2>Active Listings</h2>
         {% for listing in active_listings %}
             <div class="card" style="width: 18rem;">
-                <img src="/Users/nick/Cartio/Commerce/static/Images/{{ listing.listing_image }}" class="card-img-top" alt="{{listing.listing_name}}">
+                <img src="../static/Images/{{ listing.listing_image }}" class="card-img-top" alt="{{listing.listing_name}}">
                 <div class="card-body">
                     <h5 class="card-title">$ {{ listing.listing_price }}</h5>
                     <p class="card-text">{{ listing.listing_name }}</p>

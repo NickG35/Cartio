@@ -10,7 +10,7 @@
                 <div class="card-body">
                     <h5 class="card-title">$ {{ listing.listing_price }}</h5>
                     <p class="card-text">{{ listing.listing_name }}</p>
-                    <a href="#" class="btn btn-primary">View</a>
+                    <a href="{% url 'listing' listing_id=listing.id %}" class="btn btn-primary">View</a>
                 </div>
             </div>
         {% endfor %}

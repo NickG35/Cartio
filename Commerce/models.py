@@ -26,13 +26,7 @@ class Listing(models.Model):
     listing_price = models.IntegerField(blank=False)
     listing_date = models.DateTimeField(blank=False)
     listing_description = models.CharField(max_length = 50, blank=False)
-    listing_user = models.ForeignKey(User, on_delete=models.CASCADE)
+    listing_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listing_user')
     listing_category = models.CharField(max_length=12, choices=categories, blank=False)
-
-class Wishlist(models.Model):
-    wishlist_user = models.ForeignKey(User, on_delete=models.CASCADE)
-    wishlist_name = models.CharField(max_length = 50, blank=False)
-    wishlist_image = models.ImageField(blank=False)
-    wishlist_date = models.DateTimeField(blank=False)
-
+    listing_wishlist = models.ManyToManyField(User, related_name='wishlist_user', blank=True, null=True)
 

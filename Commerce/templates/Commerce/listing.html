@@ -1,0 +1,15 @@
+{% extends "Commerce/layout.html" %}
+
+{% block body %}
+{% for listing in listings %}
+    <h1>{{ listing.listing_name }}</h1>
+    <img src="../static/Images/{{ listing.listing_image }}">
+    <p><b>$ {{ listing.listing_price}}</b></p>
+    <p>{{ listing.listing_description }}</p>
+    <p>Category: {{ listing.listing_category }}</p>
+    <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
+
+
+{% endfor %}
+
+{% endblock %}

@@ -20,13 +20,27 @@ def create_listing(request):
           if form.is_valid():
                new_listing = form.save(commit=False)
                new_listing.listing_date = datetime.now()
-               new_listing.listing_user = request.user
+               new_listing.listing_user = request.user.id
                new_listing.save()
                return HttpResponseRedirect(reverse("index"))
      else:
           form = CreateListing()         
      return render(request, 'Commerce/create.html', {
           'form': form
+     })
+
+def listing_detail(request, listing_id):
+     listing_details = Listing.objects.filter(id=listing_id).all()
+     if request.method == "POST":
+          listing_details.add()
+     return render(request, 'Commerce/listing.html', {
+          'listings': listing_details
+     })
+
+def wishlist(request):
+     wishes = Listing.objects.filter(listing_wishlist=request.user.id).all()
+     return render(request, 'Commerce/wishlist.html', {
+          'wishes': wishes
      })
 
 def register(request):

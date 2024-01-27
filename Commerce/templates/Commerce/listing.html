@@ -3,6 +3,7 @@
 {% block body %}
 {% for listing in listings %}
     <h1>{{ listing.listing_name }}</h1>
+    <button type="button" class="btn btn-primary">Add to wishlist</button>
     <img src="../static/Images/{{ listing.listing_image }}">
     <p><b>$ {{ listing.listing_price}}</b></p>
     <p>{{ listing.listing_description }}</p>

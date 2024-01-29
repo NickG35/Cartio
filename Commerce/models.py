@@ -28,5 +28,5 @@ class Listing(models.Model):
     listing_description = models.CharField(max_length = 50, blank=False)
     listing_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listing_user')
     listing_category = models.CharField(max_length=12, choices=categories, blank=False)
-    listing_wishlist = models.ManyToManyField(User, related_name='wishlist_user', blank=True, null=True)
+    listing_wishlist = models.ManyToManyField(User, related_name='wisher', blank=True)
 

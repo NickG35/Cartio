@@ -3,7 +3,17 @@
 {% block body %}
 {% for listing in listings %}
     <h1>{{ listing.listing_name }}</h1>
-    <button type="button" class="btn btn-primary">Add to wishlist</button>
+    {% if request.user in listing.listing_wishlist.all %}
+        <form name="remove_wishlist" action="{% url 'listing' listing_id=listing.id %}" method="POST">
+            {% csrf_token %}
+            <button name="remove_wishlist" type="submit" class="btn btn-primary">Remove from wishlist</button>
+        </form>
+    {% else %}
+        <form name="add_wishlist" action="{% url 'listing' listing_id=listing.id %}"  method="POST">
+            {% csrf_token %}
+            <button name="add_wishlist" type="submit" class="btn btn-primary">Add to wishlist</button>
+        </form>
+    {% endif %}
     <img src="../static/Images/{{ listing.listing_image }}">
     <p><b>$ {{ listing.listing_price}}</b></p>
     <p>{{ listing.listing_description }}</p>

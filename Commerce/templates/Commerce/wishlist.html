@@ -1,0 +1,9 @@
+{% extends "Commerce/layout.html" %}
+
+{% block body %}
+    <h1>Wishlist</h1>
+    {% for wish in wishes %}
+        <img src=" ../static/images/{{ wish.listing_image }}">
+        <p>{{ wish.listing_name}}</p>
+    {% endfor %}
+{% endblock %}

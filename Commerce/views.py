@@ -30,13 +30,21 @@ def create_listing(request):
      })
 
 def listing_detail(request, listing_id):
+     current_user = request.user
      listing_details = Listing.objects.filter(id=listing_id).all()
-     if request.method == "POST":
-          listing_details.add()
-     return render(request, 'Commerce/listing.html', {
-          'listings': listing_details
-     })
+     wishlist_user = Listing.objects.get(id=listing_id)
+     if request.method == 'POST' and 'add_wishlist' in request.POST:
+          wishlist_user.listing_wishlist.add(current_user)
+          return HttpResponseRedirect("#")
+     elif request.method == 'POST' and 'remove_wishlist' in request.POST:
+          wishlist_user.listing_wishlist.remove(current_user)
+          return HttpResponseRedirect("#")
+     else:     
+          return render(request, 'Commerce/listing.html', {
+                'listings': listing_details,
+          })
 
+# working on how to add listings to user's wishlist by submitting form
 def wishlist(request):
      wishes = Listing.objects.filter(listing_wishlist=request.user.id).all()
      return render(request, 'Commerce/wishlist.html', {

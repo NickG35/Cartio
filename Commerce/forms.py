@@ -14,3 +14,13 @@ class CreateListing(ModelForm):
         self.fields['listing_price'].label = "Price"
         self.fields['listing_description'].label = "Description"
         self.fields['listing_category'].label = "Category"
+
+class CategoryForm(ModelForm):
+    class Meta:
+        model = Listing
+        fields = ('listing_category',)
+    
+    def __init__(self, *args, **kwargs):
+        super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields['listing_category'].label = "Category"
+    

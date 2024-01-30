@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import User, Listing
-from .forms import CreateListing
+from .forms import CreateListing, CategoryForm
 from datetime import datetime 
 
 # Create your views here.
@@ -35,10 +35,10 @@ def listing_detail(request, listing_id):
      wishlist_user = Listing.objects.get(id=listing_id)
      if request.method == 'POST' and 'add_wishlist' in request.POST:
           wishlist_user.listing_wishlist.add(current_user)
-          return HttpResponseRedirect("#")
+          return HttpResponseRedirect("")
      elif request.method == 'POST' and 'remove_wishlist' in request.POST:
           wishlist_user.listing_wishlist.remove(current_user)
-          return HttpResponseRedirect("#")
+          return HttpResponseRedirect("")
      else:     
           return render(request, 'Commerce/listing.html', {
                 'listings': listing_details,
@@ -50,6 +50,22 @@ def wishlist(request):
      return render(request, 'Commerce/wishlist.html', {
           'wishes': wishes
      })
+
+def category(request):
+     if request.method == 'POST':
+          form = CategoryForm
+          category = request.POST['listing_category']
+          categories = Listing.objects.filter(listing_category=category).all()
+          return render(request, 'Commerce/categories.html', {
+               'form': form,
+               'categories':categories
+          })
+
+     else: 
+          form = CategoryForm
+          return render(request, 'Commerce/categories.html', {
+               'form': form,
+          })
 
 def register(request):
      if request.method == "POST":

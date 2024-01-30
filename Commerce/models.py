@@ -30,3 +30,14 @@ class Listing(models.Model):
     listing_category = models.CharField(max_length=12, choices=categories, blank=False)
     listing_wishlist = models.ManyToManyField(User, related_name='wisher', blank=True)
 
+class Bid(models.Model):
+    bidding_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bidding_user')
+    bidding_price = models.IntegerField(blank=False)
+    bidding_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bid_listing')
+
+class Comments(models.Model):
+    comment_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_user')
+    comment_comment = models.CharField(max_length = 300)
+
+
+

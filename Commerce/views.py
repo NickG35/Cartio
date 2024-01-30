@@ -35,10 +35,10 @@ def listing_detail(request, listing_id):
      wishlist_user = Listing.objects.get(id=listing_id)
      if request.method == 'POST' and 'add_wishlist' in request.POST:
           wishlist_user.listing_wishlist.add(current_user)
-          return HttpResponseRedirect("")
+          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      elif request.method == 'POST' and 'remove_wishlist' in request.POST:
           wishlist_user.listing_wishlist.remove(current_user)
-          return HttpResponseRedirect("")
+          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      else:     
           return render(request, 'Commerce/listing.html', {
                 'listings': listing_details,

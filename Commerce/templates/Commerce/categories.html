@@ -1,0 +1,14 @@
+{% extends "Commerce/layout.html" %}
+
+{% block body %}
+    <h1>Category</h1>
+    <form action="" method="post">
+        {% csrf_token%}
+        {{ form }}
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+        {% for category in categories %}
+            <img src="../static/Images/{{ category.listing_image }}">
+            <p>{{ category.listing_name }}</p>
+        {% endfor %}
+{% endblock %}

@@ -34,10 +34,12 @@ class Bid(models.Model):
     bidding_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bidding_user')
     bidding_price = models.IntegerField(blank=False)
     bidding_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bid_listing')
+    bid_count = models.IntegerField(default=0)
 
 class Comments(models.Model):
     comment_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_user')
     comment_comment = models.CharField(max_length = 300)
+    comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listing_comment', blank=True, null=True)
 
 
 

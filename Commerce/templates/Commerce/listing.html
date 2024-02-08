@@ -2,7 +2,9 @@
 
 {% block body %}
 {% for listing in listings %}
+
     <h1>{{ listing.listing_name }}</h1>
+
     {% if request.user in listing.listing_wishlist.all %}
         <form name="remove_wishlist" action="{% url 'listing' listing_id=listing.id %}" method="POST">
             {% csrf_token %}
@@ -14,33 +16,38 @@
             <button name="add_wishlist" type="submit" class="btn btn-primary">Add to wishlist</button>
         </form>
     {% endif %}
+
     <img src="../static/Images/{{ listing.listing_image }}">
+
     <h2>Make a bid</h2>
-    <form action="" method="post">
+
+    <form name="bid" action="" method="post">
         {% csrf_token %}
         {{ form }}
-        <button class="btn btn-primary" type="submit">Bid</button>
+        <button name="bid" class="btn btn-primary" type="submit">Bid</button>
     </form>
-        <p>{{ listing.bidding_count }} bid(s) made</p>
-        {% if listing.bidding_count == 0 %}
-            <p>$ {{ listing.listing_price }}</p>
-        {% else %}
-            <p>{{ listing.listing_bids }}</p>
-        {% endif %}
+
+    <p>{{ listing.bidding_count }} bid(s) made</p>
+    {% if listing.bidding_count == 0 %}
+        <p>$ {{ listing.listing_price }}</p>
+    {% else %}
+        <p>{{ listing.listing_bids }}</p>
+    {% endif %}
     <p>{{ listing.listing_description }}</p>
     <p>Category: {{ listing.listing_category }}</p>
     <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
+
     <h2>Leave a comment</h2>
-    <form action="" method="post">
+    <form name='comment' action="" method="post">
         {% csrf_token %}
         {{ formy }}
-        <button class="btn btn-primary" type="submit">Comment</button>
+        <button name="comment" class="btn btn-primary" type="submit">Comment</button>
     </form>
+
     {% for comment in comments %}
         <p>{{ comment.comment_user }}</p>
         <p>{{ comment.comment_comment }}</p>
     {% endfor %}
-
 
 {% endfor %}
 

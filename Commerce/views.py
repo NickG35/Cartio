@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 def index(request):
     # display all listings that were created by all users
-    active_listings = Listing.objects.all()
+    active_listings = Listing.objects.filter(listing_closed=False).all()
     return render(request, 'Commerce/index.html', {
           'active_listings': active_listings
     })
@@ -37,7 +37,8 @@ def listing_detail(request, listing_id):
      listing_details = Listing.objects.filter(id=listing_id).all()
      listing_object = get_object_or_404(Listing, id=listing_id)
      starting_price = listing_object.listing_price
-     bid_price = listing_object.listing_bids
+     bid_price = listing_object.listing_bid_price
+     current_bidder = Bid.objects.filter(bidding_listing=listing_object).last()
      comments = Comments.objects.filter(comment_listing=listing_object).all()
      if request.method == 'POST':
           # organizing post requests by form and passing variables to bid and comment views
@@ -45,6 +46,11 @@ def listing_detail(request, listing_id):
                process_bid(request, listing_object, current_user, starting_price, bid_price)
           elif 'comment' in request.POST:
                process_comment(request, listing_object, current_user)
+          elif 'close' in request.POST:
+               listing_object.listing_closed = True
+               listing_object.listing_bid_winner = current_bidder.bidding_user
+               listing_object.save()
+               return HttpResponseRedirect(reverse("index"))
           # add listing to wishlist
           elif 'add_wishlist' in request.POST:
                listing_object.listing_wishlist.add(current_user)
@@ -77,14 +83,14 @@ def process_bid(request, listing_object, current_user, starting_price, bid_price
           # if no bids are posted, the first bid can be greater or equal to the original price
           if bid_price is None:
                if current_bid >= starting_price:
-                    listing_object.listing_bids = current_bid
+                    listing_object.listing_bid_price = current_bid
                     listing_object.bidding_count += 1
                else:
                     raise ValueError('bid is invalid')
           # if there are bids posted, subsequent bids must be greater
           else:
-               if current_bid > listing_object.listing_bids:
-                    listing_object.listing_bids = current_bid
+               if current_bid > listing_object.listing_bid_price:
+                    listing_object.listing_bid_price = current_bid
                     listing_object.bidding_count += 1
                else:
                     raise ValueError('bid is invalid')
@@ -126,6 +132,12 @@ def category(request):
           return render(request, 'Commerce/categories.html', {
                'form': form,
           })
+
+def closed_listing(request):
+     closed_listings = Listing.objects.filter(listing_closed=True).all()
+     return render(request, 'Commerce/closed_listings.html', {
+          'closed_listings': closed_listings 
+     })
 
 def register(request):
      # allow a user to register for the site

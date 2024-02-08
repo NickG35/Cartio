@@ -29,17 +29,31 @@ class Listing(models.Model):
     listing_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listing_user')
     listing_category = models.CharField(max_length=12, choices=categories, blank=False)
     listing_wishlist = models.ManyToManyField(User, related_name='wisher', blank=True)
+    listing_bids = models.IntegerField(blank=True, null=True)
+    bidding_count = models.IntegerField(default=0)
+    
+
+    def __str__(self):
+        return f"{self.listing_name}"
+
 
 class Bid(models.Model):
     bidding_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='bidding_user')
     bidding_price = models.IntegerField(blank=False)
     bidding_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='bid_listing')
-    bid_count = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.bidding_listing}"
+
+
 
 class Comments(models.Model):
     comment_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comment_user')
     comment_comment = models.CharField(max_length = 300)
     comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listing_comment', blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.comment_comment}"
 
 
 

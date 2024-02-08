@@ -2,6 +2,7 @@
 
 {% block body %}
 <h1 class="center-text">Login</h1>
+    {{ message }}
     <form action="{% url 'login' %}" method="post">
         {% csrf_token %}
         <div class="mb-3">

@@ -1,6 +1,6 @@
 from django import forms 
 from django.forms import ModelForm
-from .models import Listing
+from .models import Listing, Bid, Comments
 
 class CreateListing(ModelForm):
     class Meta:
@@ -23,4 +23,24 @@ class CategoryForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ModelForm, self).__init__(*args, **kwargs)
         self.fields['listing_category'].label = "Category"
+
+class BidForm(ModelForm):
+    class Meta:
+        model = Bid
+        fields = ('bidding_price',)
+    
+    def _init_(self, *args, **kwargs):
+        super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields['bidding_price'].label = ""
+
+class CommentForm(ModelForm):
+    class Meta:
+        model = Comments
+        fields = ('comment_comment',)
+    
+    def _init_(self, *args, **kwargs):
+        super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields('comment_comment').label = ""
+
+
     

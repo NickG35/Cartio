@@ -29,7 +29,9 @@ class Listing(models.Model):
     listing_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listing_user')
     listing_category = models.CharField(max_length=12, choices=categories, blank=False)
     listing_wishlist = models.ManyToManyField(User, related_name='wisher', blank=True)
-    listing_bids = models.IntegerField(blank=True, null=True)
+    listing_closed = models.BooleanField(default=False)
+    listing_bid_price = models.IntegerField(blank=True, null=True)
+    listing_bid_winner = models.ForeignKey(User, related_name='bid_winner', blank=True, null=True, on_delete=models.PROTECT)
     bidding_count = models.IntegerField(default=0)
     
 

@@ -4,14 +4,17 @@
 {% for listing in listings %}
 
     <h1>{{ listing.listing_name }}</h1>
+    {% if listing.listing_bid_winner == request.user and listing.listing_closed == True %}
+        <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
+    {% endif %}
 
     {% if request.user in listing.listing_wishlist.all %}
-        <form name="remove_wishlist" action="{% url 'listing' listing_id=listing.id %}" method="POST">
+        <form name="remove_wishlist" action="" method="post">
             {% csrf_token %}
             <button name="remove_wishlist" type="submit" class="btn btn-primary">Remove from wishlist</button>
         </form>
     {% else %}
-        <form name="add_wishlist" action="{% url 'listing' listing_id=listing.id %}"  method="POST">
+        <form name="add_wishlist" action=""  method="post">
             {% csrf_token %}
             <button name="add_wishlist" type="submit" class="btn btn-primary">Add to wishlist</button>
         </form>
@@ -31,7 +34,7 @@
     {% if listing.bidding_count == 0 %}
         <p>$ {{ listing.listing_price }}</p>
     {% else %}
-        <p>{{ listing.listing_bids }}</p>
+        <p>$ {{ listing.listing_bid_price }}</p>
     {% endif %}
     <p>{{ listing.listing_description }}</p>
     <p>Category: {{ listing.listing_category }}</p>
@@ -48,6 +51,13 @@
         <p>{{ comment.comment_user }}</p>
         <p>{{ comment.comment_comment }}</p>
     {% endfor %}
+
+    {% if listing.listing_user == request.user and listing.listing_closed == False %}
+    <form name="close" action="" method="post">
+        {% csrf_token %}
+        <button name="close" class="btn btn-danger" type="submit">Close</button>
+    </form>
+    {% endif %}
 
 {% endfor %}
 

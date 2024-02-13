@@ -22,7 +22,7 @@ categories = (
 )
 class Listing(models.Model):
     listing_name = models.CharField(max_length = 50, blank=False)
-    listing_image = models.ImageField(blank=False)
+    listing_image = models.ImageField(blank=False, upload_to="images/")
     listing_price = models.IntegerField(blank=False)
     listing_date = models.DateTimeField(blank=False)
     listing_description = models.CharField(max_length = 50, blank=False)

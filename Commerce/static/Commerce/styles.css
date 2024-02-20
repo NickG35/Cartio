@@ -286,3 +286,30 @@ then set the desired styles for .card-img. */
   transform: translateY(10px);
   transition: 100ms;
 }
+
+#comment_form {
+  border: 1px solid;
+  width: 700px;
+}
+
+.comment_section {
+  text-align: center;
+  width: 87%;
+  padding: 30px;
+}
+
+.comment_button {
+  width: 73%;
+}
+
+#comment_button {
+  display: flex;
+  margin-left: auto;
+
+}
+
+.close-form {
+  margin: 25px;
+  text-align: center;
+  width: 85%;
+}

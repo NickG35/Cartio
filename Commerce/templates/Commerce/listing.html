@@ -29,12 +29,12 @@
                         <button name="bid" class="input-add-on" type="submit">Bid</button>
                     </div>
             </form>
-            <p>{{ listing.bidding_count }} bid(s) on this item.</p>
             {% if listing.bidding_count == 0 %}
                 <p>$ {{ listing.listing_price }}</p>
             {% else %}
                 <p>$ {{ listing.listing_bid_price }}</p>
             {% endif %}
+            <p>{{ listing.bidding_count }} bid(s) on this item.</p>
             <p>{{ listing.listing_description }}</p>
             <p>Category: {{ listing.listing_category }}</p>
             <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
@@ -44,7 +44,9 @@
         <form name='comment' action="" method="post">
             {% csrf_token %}
             {{ formy }}
-            <button name="comment" class="btn btn-primary" type="submit">Comment</button>
+            <div class="comment_button">
+                <button name="comment" id="comment_button" class="btn btn-primary" type="submit">Comment</button>
+            </div>
         </form>
     </div>
 
@@ -54,10 +56,12 @@
     {% endfor %}
 
     {% if listing.listing_user == request.user and listing.listing_closed == False %}
-    <form name="close" action="" method="post">
-        {% csrf_token %}
-        <button name="close" class="btn btn-danger" type="submit">Close</button>
-    </form>
+    <div class="close-form">
+        <form name="close" action="" method="post">
+            {% csrf_token %}
+            <button name="close" class="btn btn-danger" id="close_button" type="submit">Close Listing</button>
+        </form>
+    </div>
     {% endif %}
 
 {% endfor %}

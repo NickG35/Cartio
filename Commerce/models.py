@@ -6,6 +6,7 @@ class User(AbstractUser):
     pass
 
 categories = (
+    ('', 'Select a category'),
     ('technology', 'Technology'),
     ('art', 'Art'),
     ('tools', 'Tools'),

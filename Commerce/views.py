@@ -48,7 +48,10 @@ def listing_detail(request, listing_id):
                process_comment(request, listing_object, current_user)
           elif 'close' in request.POST:
                listing_object.listing_closed = True
-               listing_object.listing_bid_winner = current_bidder.bidding_user
+               if current_bidder is not None:
+                    listing_object.listing_bid_winner = current_bidder.bidding_user
+               else:
+                    listing_object.listing_bid_winner = listing_object.listing_user
                listing_object.save()
                return HttpResponseRedirect(reverse("index"))
           # add listing to wishlist
@@ -70,6 +73,7 @@ def listing_detail(request, listing_id):
                     'comments': comments,
                     'starting_price': starting_price,
                     'bid_count': listing_object.bidding_count,
+                    'bidder': current_bidder.bidding_user
           })
 
 def process_bid(request, listing_object, current_user, starting_price, bid_price):      
@@ -110,7 +114,7 @@ def process_comment(request, listing_object, current_user):
 
 def wishlist(request):
      # display wishlist items of the specific user signed in 
-     wishes = Listing.objects.filter(listing_wishlist=request.user.id).all()
+     wishes = Listing.objects.filter(listing_wishlist=request.user.id,listing_closed=False).all()
      return render(request, 'Commerce/wishlist.html', {
           'wishes': wishes
      })

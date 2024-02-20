@@ -48,9 +48,13 @@ class CommentForm(ModelForm):
     class Meta:
         model = Comments
         fields = ('comment_comment',)
+        widgets = {
+            'comment_comment': forms.Textarea(attrs={'rows': 4}),
+        }
     
     def __init__(self, *args, **kwargs):
         super(ModelForm, self).__init__(*args, **kwargs)
+        self.fields['comment_comment'].widget.attrs["id"] = "comment_form"
         self.fields['comment_comment'].widget.attrs["placeholder"] = "Leave a comment..."
         self.fields['comment_comment'].label = ""
 

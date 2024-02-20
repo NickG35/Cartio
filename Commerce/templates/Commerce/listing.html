@@ -2,50 +2,52 @@
 
 {% block body %}
 {% for listing in listings %}
-
-    <h1>{{ listing.listing_name }}</h1>
-    {% if listing.listing_bid_winner == request.user and listing.listing_closed == True %}
-        <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
-    {% endif %}
-
-    {% if request.user in listing.listing_wishlist.all %}
-        <form name="remove_wishlist" action="" method="post">
+    <div id="image-container" class="container">
+        <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
+        <div class="inner-container">
+            <div id="header-container" class="container">
+                <h1 class="header">{{ listing.listing_name }}</h1>
+                {% if request.user in listing.listing_wishlist.all %}
+                <form name="remove_wishlist" action="" method="post">
+                    {% csrf_token %}
+                    <button name="remove_wishlist" type="submit" class="btn btn-light"><i class="fa-solid fa-clock" style="color: #8c00ff;"></i></button>
+                </form>
+                {% else %}
+                    <form name="add_wishlist" action=""  method="post">
+                        {% csrf_token %}
+                        <button name="add_wishlist" type="submit" class="btn btn-light"><i class="fa-regular fa-clock" style="color: #8c00ff;"></i></button>
+                    </form>
+                {% endif %}
+            </div>
+            {% if listing.listing_bid_winner == request.user and listing.listing_closed == True %}
+                <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
+            {% endif %}
+            <form class="form-container" name="bid" action="" method="post">
+                    {% csrf_token %}
+                    {{ form }}
+                    <div class="input-group-append">
+                        <button name="bid" class="input-add-on" type="submit">Bid</button>
+                    </div>
+            </form>
+            <p>{{ listing.bidding_count }} bid(s) on this item.</p>
+            <small>Most recent bid made by <b>{{ bidder }}</b></small>
+            {% if listing.bidding_count == 0 %}
+                <p>$ {{ listing.listing_price }}</p>
+            {% else %}
+                <p>$ {{ listing.listing_bid_price }}</p>
+            {% endif %}
+            <p>{{ listing.listing_description }}</p>
+            <p>Category: {{ listing.listing_category }}</p>
+            <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
+        </div>
+    </div>
+    <div class="comment_section">
+        <form name='comment' action="" method="post">
             {% csrf_token %}
-            <button name="remove_wishlist" type="submit" class="btn btn-primary">Remove from wishlist</button>
+            {{ formy }}
+            <button name="comment" class="btn btn-primary" type="submit">Comment</button>
         </form>
-    {% else %}
-        <form name="add_wishlist" action=""  method="post">
-            {% csrf_token %}
-            <button name="add_wishlist" type="submit" class="btn btn-primary">Add to wishlist</button>
-        </form>
-    {% endif %}
-
-    <img src="../static/Images/{{ listing.listing_image }}">
-
-    <h2>Make a bid</h2>
-
-    <form name="bid" action="" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button name="bid" class="btn btn-primary" type="submit">Bid</button>
-    </form>
-
-    <p>{{ listing.bidding_count }} bid(s) made</p>
-    {% if listing.bidding_count == 0 %}
-        <p>$ {{ listing.listing_price }}</p>
-    {% else %}
-        <p>$ {{ listing.listing_bid_price }}</p>
-    {% endif %}
-    <p>{{ listing.listing_description }}</p>
-    <p>Category: {{ listing.listing_category }}</p>
-    <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
-
-    <h2>Leave a comment</h2>
-    <form name='comment' action="" method="post">
-        {% csrf_token %}
-        {{ formy }}
-        <button name="comment" class="btn btn-primary" type="submit">Comment</button>
-    </form>
+    </div>
 
     {% for comment in comments %}
         <p>{{ comment.comment_user }}</p>

@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
@@ -73,7 +74,6 @@ def listing_detail(request, listing_id):
                     'comments': comments,
                     'starting_price': starting_price,
                     'bid_count': listing_object.bidding_count,
-                    'bidder': current_bidder.bidding_user
           })
 
 def process_bid(request, listing_object, current_user, starting_price, bid_price):      

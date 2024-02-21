@@ -2,8 +2,25 @@
 
 {% block body %}
     <h1>Wishlist</h1>
+    <div class="row row-cols-1 row-cols-md-6 g-1 m-5">
     {% for wish in wishes %}
-        <img src=" ../static/images/{{ wish.listing_image }}">
-        <p>{{ wish.listing_name}}</p>
+    <div class="col">
+        <div class="card h-100">
+            <div class="card-img"><div class="img"><img src="{{ wish.listing_image.url }}" alt="{{wish.listing_name}}"></div></div>
+            <div class="card-title">{{ wish.listing_name }}</div>
+            <div class="card-subtitle">{{ wish.listing_description }}</div>
+            <hr class="card-divider">
+            <div class="card-footer">
+                <div class="card-price">
+                    {% if wish.listing_bid_price is none %}
+                        <h5 class="card-title">$ {{ wish.listing_price }}</h5>
+                    {% else %}
+                        <h5 class="card-title">$ {{ wish.listing_bid_price }}</h5>
+                    {% endif %}
+                </div>
+                <a href="{% url 'listing' listing_id=wish.id %}"><button class="card-btn">View</button></a>
+            </div>
+        </div>
+    </div>
     {% endfor %}
 {% endblock %}

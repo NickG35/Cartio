@@ -4,23 +4,17 @@
 
 <h2>Closed Listings</h2>
 
-<div class="container">
-
+    <div class="row row-cols-1 row-cols-md-6 g-1 m-5">
     {% for listing in closed_listings %}
-        <div class="card" style="width: 18rem;">
-            <img src="../static/Images/{{ listing.listing_image }}" class="card-img-top" alt="{{listing.listing_name}}">
-            <div class="card-body">
-                {% if listing.listing_bid_price is none %}
-                    <h5 class="card-title">$ {{ listing.listing_price }}</h5>
-                {% else %}
-                    <h5 class="card-title">$ {{ listing.listing_bid_price }}</h5>
-                {% endif %}
-                <p class="card-text">{{ listing.listing_name }}</p>
-                <a href="{% url 'listing' listing_id=listing.id %}" class="btn btn-primary">View</a>
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
+                <div class="card-title">{{ listing.listing_name }}</div>
+                <div id="closed-fotter" class="card-footer">
+                    <a class="closed-link" href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
+                </div>
             </div>
         </div>
     {% endfor %}
-
-</div>
 
 {% endblock %}

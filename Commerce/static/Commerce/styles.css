@@ -174,7 +174,7 @@ then set the desired styles for .card-img. */
 }
 
 .card-btn:hover {
-  border: 2px solid var(--main-focus);
+  border: 2px solid #4F46E5;
 }
 
 .card-btn:hover svg {
@@ -312,4 +312,10 @@ then set the desired styles for .card-img. */
   margin: 25px;
   text-align: center;
   width: 85%;
+}
+
+.closed-link {
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
 }

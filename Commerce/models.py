@@ -1,9 +1,28 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save
 
 # Create your models here.
 class User(AbstractUser):
     pass
+
+class Profile(models.Model):
+    # each user has a profile
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    # one profile can follow other profiles, symettrical is set to false because the user doesnt have to follow back their followers, and it is blank because they dont have to follow anyone
+    follow = models.ManyToManyField("self",
+                                    related_name="followed_by",
+                                    symmetrical=False,
+                                    blank=True)
+    def __str__(self):
+        return self.user.username
+    
+    # automatically create profile when user signs up 
+    def create_profile(sender, instance, created, **kwargs):
+        if created:
+            user_profile = Profile(user=instance)
+            user_profile.save()
+    post_save.connect(create_profile, sender=User)
 
 categories = (
     ('', 'Select a category'),

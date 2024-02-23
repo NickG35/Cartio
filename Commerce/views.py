@@ -125,7 +125,7 @@ def category(request):
           form = CategoryForm
           # the category selected and submitted will display all listings that are under that specific category
           category = request.POST['listing_category']
-          categories = Listing.objects.filter(listing_category=category).all()
+          categories = Listing.objects.filter(listing_category=category, listing_closed=False ).all()
           return render(request, 'Commerce/categories.html', {
                'form': form,
                'categories':categories

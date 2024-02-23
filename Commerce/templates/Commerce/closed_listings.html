@@ -2,15 +2,15 @@
 
 {% block body %}
 
-<h2>Closed Listings</h2>
+<h2 class="header">Closed Listings</h2>
 
-    <div class="row row-cols-1 row-cols-md-6 g-1 m-5">
+    <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
     {% for listing in closed_listings %}
         <div class="col">
             <div class="card h-100">
                 <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
                 <div class="card-title">{{ listing.listing_name }}</div>
-                <div id="closed-fotter" class="card-footer">
+                <div id="closed-footer" class="card-footer">
                     <a class="closed-link" href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
                 </div>
             </div>

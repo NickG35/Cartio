@@ -11,4 +11,5 @@ urlpatterns = [
     path('wishlist', views.wishlist, name='wishlist'),
     path('categories', views.category, name='category'),
     path('closed_listings', views.closed_listing, name='closed_listing'),
+    path('<str:profile>', views.profile, name='profile'),
 ]

@@ -6,14 +6,10 @@ from .models import User, Listing, Comments, Bid, Profile
 class ProfileInline(admin.StackedInline):
     model= Profile
 
-class ListingInline(admin.StackedInline):
-    model = Listing
-    fk_name = 'listing_user'
-
 class UserAdmin(admin.ModelAdmin):
     model = User
     fields = ["username"]
-    inlines = [ProfileInline, ListingInline]
+    inlines = [ProfileInline]
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Listing)

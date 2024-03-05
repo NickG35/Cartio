@@ -1,26 +1,10 @@
-body {
-  width: 100%;
-  height: 100%;
 
-  background: #000000;
-  --gap: 5em;
-  --line: 1px;
-  --color: rgba(255, 255, 255, 0.2);
-
-  background-image: linear-gradient(
-      -90deg,
-      transparent calc(var(--gap) - var(--line)),
-      var(--color) calc(var(--gap) - var(--line) + 1px),
-      var(--color) var(--gap)
-    ),
-}
 .nav-logo {
     width: 45px; 
     height: 45px;
 }
 
 .centered {
-  text-align: center;
   margin: 15px;
 }
 
@@ -427,6 +411,74 @@ then set the desired styles for .card-img. */
   background-position: 50% 120%;
   animation: greentopBubbles 0.6s ease;
 }
+
+.profile_pic {
+  border-radius: 100%;
+  border: solid black 3px;
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.profile_picture {
+  margin: 15px;
+}
+
+.bio {
+  text-align: center;
+  margin: 15px;
+  width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#bio_field {
+  border: 1px solid black;
+  padding: 5px;
+
+}
+
+
+.edit_bio {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.follow-area {
+  width: 300px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.followed {
+  display: flex;
+}
+.follow-left, .follow-right {
+  width: 50%;
+}
+
+#change_pic {
+  display: none;
+}
+
+.edit_pfp {
+  border: 1px solid black;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.edit_pfp_div {
+  text-align: center;
+}
+
+.change_picture {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+
+
 
 @keyframes greentopBubbles {
   0% {

@@ -4,8 +4,8 @@ from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import User, Listing, Comments, Bid
-from .forms import CreateListing, CategoryForm, BidForm, CommentForm
+from .models import User, Listing, Comments, Bid, Profile
+from .forms import CreateListing, CategoryForm, BidForm, CommentForm, EditProfileForm
 from datetime import datetime 
 from django.core.exceptions import ValidationError
 
@@ -16,6 +16,37 @@ def index(request):
           'active_listings': active_listings
     })
 
+def profile(request, profile_id):
+     profile_user = Profile.objects.get(user_id=profile_id)
+     if request.method == 'POST':
+          if 'profile_pic' in request.FILES:
+               editprofileform = EditProfileForm(request.FILES)
+               if editprofileform.is_valid():
+                    profile_pic_file = request.FILES['profile_pic']
+                    profile_user.profile_pic = profile_pic_file
+                    profile_user.save()
+          elif 'bio' in request.POST:
+               editprofileform = EditProfileForm(request.POST)
+               if editprofileform.is_valid():
+                    bio = editprofileform.cleaned_data['bio']
+                    profile_user.bio = bio
+                    profile_user.save()
+
+          elif 'unfollow' in request.POST:
+               follower = request.POST['follower']
+               profile_user.followed_by.remove(follower)
+          elif 'follow' in request.POST:
+               follower = request.POST['follower']
+               profile_user.followed_by.add(follower)
+          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+     else:
+          editprofileform = EditProfileForm(instance=profile_user)
+          profile = Profile.objects.get(user_id=profile_id)
+          return render(request, 'Commerce/profile.html', {
+               'profile': profile,
+               'editprofileform': editprofileform
+          })
+
 def create_listing(request):
      if request.method == "POST":
           # form that allows user to create their own listings
@@ -23,7 +54,7 @@ def create_listing(request):
           if form.is_valid():
                new_listing = form.save(commit=False)
                new_listing.listing_date = datetime.now()
-               new_listing.listing_user = request.user
+               new_listing.listing_user = request.profile.user
                new_listing.save()
                return HttpResponseRedirect(reverse("index"))
      else:
@@ -34,7 +65,7 @@ def create_listing(request):
 
 def listing_detail(request, listing_id):
      # variables used to pass through bids and comments forms
-     current_user = request.user
+     current_user = request.user.profile
      listing_details = Listing.objects.filter(id=listing_id).all()
      listing_object = get_object_or_404(Listing, id=listing_id)
      starting_price = listing_object.listing_price

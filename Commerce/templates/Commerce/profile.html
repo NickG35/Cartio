@@ -1,0 +1,117 @@
+{% extends "Commerce/layout.html" %}
+
+{% block body %}
+<script>
+    document.addEventListener('DOMContentLoaded' , function(){
+        // select file input element
+        var fileInput = document.getElementById('change_pic');
+        // add event listener for the file input change
+        fileInput.addEventListener('change', function(event){
+            var file = event.target.files[0];
+
+            // select the preview image element
+            var previewImage = document.querySelector('.profile_pic');
+            // check if file is selected
+            if (file) {
+                // create filereader
+                var reader = new FileReader();
+                // set up the file reader onload event
+                reader.onload = function(e) {
+                    // set src attribute of preview image to the data's url
+                    previewImage.src = e.target.result;
+                };
+                //read the selected file as a date url
+                reader.readAsDataURL(file)
+            };
+        
+
+
+
+        });
+        
+    })
+</script>
+
+<h1 class="header">{{ profile.user }}</h1>
+<!-- Button trigger modal -->
+<button type="button" id="edit_profile" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+    Edit Profile
+  </button>
+  
+  <!-- Modal -->
+  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Profile</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <h1>Change Profile Picture:</h1>
+            <div class="profile_picture">
+                {% if profile.profile_pic %}
+                    <img class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
+                {% else %}
+                    <img class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
+                {% endif %}
+            </div>
+            <div class="edit_pfp_div">
+                <button class="edit_pfp" type="button" style="display:block;width:120px; height:30px;" onclick="document.getElementById('change_pic').click()">Edit</button>
+            </div>
+            <div class="edit_bio">
+                <h1>Change Bio:</h1>
+                <form class="change_picture" action="" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ editprofileform }}
+                    <button style="display: none;" id="edit-form-button">submit</button>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('edit-form-button').click()">Make Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+<div class="profile_picture">
+    {% if profile.profile_pic %}
+        <img class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
+    {% else %}
+        <img class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
+    {% endif %}
+</div>
+<div class="bio">
+    <p class="profile_bio">{{ profile.bio }}</p>
+</div>
+<div class="follow-area">
+    {% if request.user.profile in profile.followed_by.all %}
+        <form name="unfollow" action="" method="post">
+            {% csrf_token %}
+            <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
+            <button name="unfollow" type="submit" class="btn btn-primary">Following</button>
+        </form>
+    {% else %}
+        <form name="follow" action="" method="post">
+            {% csrf_token %}
+            <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
+            <button name="follow" type="submit" class="btn btn-primary">Follow</button>
+        </form>
+    {% endif %}
+    <div class="followed">
+        <div class="follow-left">
+            <p><b>Followers</b></p>
+            <p>{{ profile.followed_by.all|length }}</p>
+        </div>
+        <div class="follow-right">
+            <p><b>Following</b></p>
+            <p>{{ profile.follow.all|length }}</p>
+        </div>
+    </div>
+</div>
+<h2>Listings Posted</h2>
+<h2>Auctions Won</h2>
+
+
+
+{% endblock %}

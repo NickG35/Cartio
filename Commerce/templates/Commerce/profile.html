@@ -23,9 +23,6 @@
                 //read the selected file as a date url
                 reader.readAsDataURL(file)
             };
-        
-
-
 
         });
         
@@ -82,7 +79,11 @@
     {% endif %}
 </div>
 <div class="bio">
-    <p class="profile_bio">{{ profile.bio }}</p>
+    {% if profile_bio is not None %}
+        <p class="profile_bio">{{ profile.bio }}</p>
+    {% else %}
+        <p></p>
+    {% endif %}
 </div>
 <div class="follow-area">
     {% if user.is_authenticated %}

@@ -18,6 +18,8 @@ def index(request):
 
 def profile(request, profile_id):
      profile_user = Profile.objects.get(user_id=profile_id)
+     profile_listings = Listing.objects.filter(listing_user=profile_user).all()
+     listing_wins = Listing.objects.filter(listing_bid_winner=profile_user).all()
      if request.method == 'POST':
           if 'profile_pic' in request.FILES:
                editprofileform = EditProfileForm(request.FILES)
@@ -44,7 +46,10 @@ def profile(request, profile_id):
           profile = Profile.objects.get(user_id=profile_id)
           return render(request, 'Commerce/profile.html', {
                'profile': profile,
-               'editprofileform': editprofileform
+               'profile_user': profile_user,
+               'editprofileform': editprofileform,
+               'listings': profile_listings,
+               'wins': listing_wins
           })
 
 def create_listing(request):
@@ -54,7 +59,7 @@ def create_listing(request):
           if form.is_valid():
                new_listing = form.save(commit=False)
                new_listing.listing_date = datetime.now()
-               new_listing.listing_user = request.profile.user
+               new_listing.listing_user = request.user.profile
                new_listing.save()
                return HttpResponseRedirect(reverse("index"))
      else:
@@ -65,7 +70,6 @@ def create_listing(request):
 
 def listing_detail(request, listing_id):
      # variables used to pass through bids and comments forms
-     current_user = request.user.profile
      listing_details = Listing.objects.filter(id=listing_id).all()
      listing_object = get_object_or_404(Listing, id=listing_id)
      starting_price = listing_object.listing_price
@@ -75,9 +79,9 @@ def listing_detail(request, listing_id):
      if request.method == 'POST':
           # organizing post requests by form and passing variables to bid and comment views
           if 'bid' in request.POST:
-               process_bid(request, listing_object, current_user, starting_price, bid_price)
+               process_bid(request, listing_object, starting_price, bid_price)
           elif 'comment' in request.POST:
-               process_comment(request, listing_object, current_user)
+               process_comment(request, listing_object)
           elif 'close' in request.POST:
                listing_object.listing_closed = True
                if current_bidder is not None:
@@ -88,10 +92,10 @@ def listing_detail(request, listing_id):
                return HttpResponseRedirect(reverse("index"))
           # add listing to wishlist
           elif 'add_wishlist' in request.POST:
-               listing_object.listing_wishlist.add(current_user)
+               listing_object.listing_wishlist.add(request.user.profile.id)
           # remove listing from wishlist
           elif 'remove_wishlist' in request.POST:
-               listing_object.listing_wishlist.remove(current_user)
+               listing_object.listing_wishlist.remove(request.user.profile.id)
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      else:
           # presents bid and comment forms
@@ -107,12 +111,12 @@ def listing_detail(request, listing_id):
                     'bid_count': listing_object.bidding_count,
           })
 
-def process_bid(request, listing_object, current_user, starting_price, bid_price):      
+def process_bid(request, listing_object, starting_price, bid_price):      
      form = BidForm(request.POST)
      # bid form to allow users to post bids
      if form.is_valid():
           new_bid = form.save(commit=False)
-          new_bid.bidding_user = current_user
+          new_bid.bidding_user = request.user.profile
           new_bid.bidding_listing = listing_object
           current_bid = new_bid.bidding_price
           # if no bids are posted, the first bid can be greater or equal to the original price
@@ -134,18 +138,18 @@ def process_bid(request, listing_object, current_user, starting_price, bid_price
           # update user bid information when form is submitted
           new_bid.save()
           
-def process_comment(request, listing_object, current_user):
+def process_comment(request, listing_object):
      # comment form allows users to post their comments on a listing
      formy = CommentForm(request.POST)
      if formy.is_valid():
           new_comment = formy.save(commit=False)
-          new_comment.comment_user = current_user
+          new_comment.comment_user = request.user.profile
           new_comment.comment_listing = listing_object
           new_comment.save()
 
 def wishlist(request):
      # display wishlist items of the specific user signed in 
-     wishes = Listing.objects.filter(listing_wishlist=request.user.id,listing_closed=False).all()
+     wishes = Listing.objects.filter(listing_wishlist=request.user.profile.id,listing_closed=False).all()
      return render(request, 'Commerce/wishlist.html', {
           'wishes': wishes
      })
@@ -221,4 +225,4 @@ def login_view(request):
 def logout_view(request):
      # log user out of site
      logout(request)
-     return render(request, "Commerce/login.html")
+     return HttpResponseRedirect(reverse("index"))

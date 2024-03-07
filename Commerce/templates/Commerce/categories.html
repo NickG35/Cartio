@@ -9,8 +9,16 @@
             <button type="submit" class="category-button">Search</button>
         </form>
     </div>  
-        {% for category in categories %}
-            <img src="../static/Images/{{ category.listing_image }}">
-            <p>{{ category.listing_name }}</p>
+        <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
+            {% for category in categories %}
+                <div class="col">
+                    <div class="card h-100">
+                        <div class="card-img"><div class="img"><img src="{{ category.listing_image.url }}" alt="{{category.listing_name}}"></div></div>
+                        <div class="card-title">{{ category.listing_name }}</div>
+                        <div id="closed-footer" class="card-footer">
+                            <a class="closed-link" href="{% url 'listing' listing_id=category.id %}"><button class="card-btn">View</button></a>
+                        </div>
+                    </div>
+                </div>
         {% endfor %}
 {% endblock %}

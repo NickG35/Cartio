@@ -61,7 +61,11 @@
     {% for comment in comments %}
         <div class="comment-box">
             <div class="comment-left">
-                <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
+                {% if comment.comment_user.profile_pic %}
+                    <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
+                {% else %}
+                    <img class="comment-pic" src="../media/images/default_profile.png" alt="{{ comment.comment_user }}">
+                {% endif %}
             </div>
             <div class="comment-right">
                 <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>

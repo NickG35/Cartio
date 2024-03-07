@@ -477,6 +477,36 @@ then set the desired styles for .card-img. */
   margin-right: auto;
 }
 
+.comment-pic {
+  border-radius: 100%;
+  width: 45px;
+  border: 1px solid lightgray;
+}
+
+.comment-right {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.comment-user {
+  font-weight: bold;
+}
+
+.comment-user:hover {
+  text-decoration: underline;
+}
+
+.comment-box {
+  display: flex;
+  padding: 15px;
+}
+
+.listing-user:hover {
+  text-decoration: underline;
+  font-weight: bold;
+}
+
 
 
 

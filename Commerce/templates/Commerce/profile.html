@@ -85,19 +85,22 @@
     <p class="profile_bio">{{ profile.bio }}</p>
 </div>
 <div class="follow-area">
-    {% if request.user.profile in profile.followed_by.all %}
-        <form name="unfollow" action="" method="post">
-            {% csrf_token %}
-            <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
-            <button name="unfollow" type="submit" class="btn btn-primary">Following</button>
-        </form>
-    {% else %}
-        <form name="follow" action="" method="post">
-            {% csrf_token %}
-            <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
-            <button name="follow" type="submit" class="btn btn-primary">Follow</button>
-        </form>
+    {% if user.is_authenticated %}
+        {% if request.user.profile in profile.followed_by.all %}
+            <form name="unfollow" action="" method="post">
+                {% csrf_token %}
+                <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
+                <button name="unfollow" type="submit" class="btn btn-primary">Following</button>
+            </form>
+        {% else %}
+            <form name="follow" action="" method="post">
+                {% csrf_token %}
+                <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
+                <button name="follow" type="submit" class="btn btn-primary">Follow</button>
+            </form>
+        {% endif %}
     {% endif %}
+
     <div class="followed">
         <div class="follow-left">
             <p><b>Followers</b></p>
@@ -110,7 +113,37 @@
     </div>
 </div>
 <h2>Listings Posted</h2>
+<div class="row row-cols-1 row-cols-md-5 g-1 m-5">
+    {% for listing in listings %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
+                <div class="card-title">{{ listing.listing_name }}</div>
+                <div id="closed-footer" class="card-footer">
+                    <a class="closed-link" href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No listings yet</p>
+    {% endfor %}
+</div>
 <h2>Auctions Won</h2>
+<div class="row row-cols-1 row-cols-md-5 g-1 m-5">
+    {% for win in wins %}
+        <div class="col">
+            <div class="card h-100">
+                <div class="card-img"><div class="img"><img src="{{ win.listing_image.url }}" alt="{{win.listing_name}}"></div></div>
+                <div class="card-title">{{ win.listing_name }}</div>
+                <div id="closed-footer" class="card-footer">
+                    <a class="closed-link" href="{% url 'listing' listing_id=win.id %}"><button class="card-btn">View</button></a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No winning auctions yet</p>
+    {% endfor %}
+</div>
 
 
 

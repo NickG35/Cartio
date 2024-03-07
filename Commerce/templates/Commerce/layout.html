@@ -22,34 +22,47 @@
 <body>
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
-                  <a class="navbar-brand" href="Commerce/index.html"><img class="nav-logo" src="media/images/navlogo.jpg"></a>
+                  <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src="media/images/navlogo.jpg"></a>
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>
                   <div class="collapse navbar-collapse" id="navbarText">
                     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                      {% if user.is_authenticated %}
                       <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{% url 'profile' profile_id=user.id %}">{{ request.user.profile }}</a>
                       </li>
+                      {% endif %}
                       <li class="nav-item">
                         <a class="nav-link" href="{% url 'index' %}">Home</a>
                       </li>
                       <li class="nav-item">
                         <a class="nav-link" href="{% url 'category' %}">Categories</a>
                       </li>
+                      {% if user.is_authenticated %}
                       <li class="nav-item">
                         <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
                       </li>
+                      {% endif %}
+                      {% if user.is_authenticated %}
                       <li class="nav-item">
                         <a class="nav-link" href="{% url 'create_listing' %}">Create a listing</a>
                       </li>
+                      {% endif %}
                       <li class="nav-item">
                         <a class="nav-link" href="{% url 'closed_listing' %}">Closed listings</a>
                       </li>
                     </ul>
+                    {% if user.is_authenticated %}
                     <span class="navbar-text">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>
                     </span>
+                    {% else %}
+                    <span class="navbar-text">
+                      <a class="nav-link" href="{% url 'login' %}">Login</a>
+                  </span>
+                  {% endif %}
+                    
                   </div>
                 </div>
             </nav>

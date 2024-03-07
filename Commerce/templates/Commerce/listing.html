@@ -7,21 +7,23 @@
         <div class="inner-container">
             <div id="header-container" class="container">
                 <h1 class="header">{{ listing.listing_name }}</h1>
-                {% if request.user in listing.listing_wishlist.all %}
+                {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
                 <form name="remove_wishlist" action="" method="post">
                     {% csrf_token %}
                     <button name="remove_wishlist" type="submit" class="btn btn-light"><i class="fa-solid fa-clock" style="color: #8c00ff;"></i></button>
                 </form>
-                {% else %}
+                {%  elif request.user.profile not in listing.listing_wishlist.all and listing.listing_closed == False  %}
                     <form name="add_wishlist" action=""  method="post">
                         {% csrf_token %}
                         <button name="add_wishlist" type="submit" class="btn btn-light"><i class="fa-regular fa-clock" style="color: #8c00ff;"></i></button>
                     </form>
                 {% endif %}
             </div>
-            {% if listing.listing_bid_winner == request.user and listing.listing_closed == True %}
+            {% if user.is_authenticated %}
+            {% if listing.listing_bid_winner == request.user.profile and listing.listing_closed == True %}
                 <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
             {% endif %}
+            {% if listing.listing_closed == False %}
             <form class="form-container" name="bid" action="" method="post">
                     {% csrf_token %}
                     {{ form }}
@@ -29,6 +31,8 @@
                         <button name="bid" class="input-add-on" type="submit">Bid</button>
                     </div>
             </form>
+            {% endif %}
+            {% endif %}
             {% if listing.bidding_count == 0 %}
                 <p>$ {{ listing.listing_price }}</p>
             {% else %}
@@ -37,9 +41,11 @@
             <p>{{ listing.bidding_count }} bid(s) on this item.</p>
             <p>{{ listing.listing_description }}</p>
             <p>Category: {{ listing.listing_category }}</p>
-            <small>Posted by <i>{{ listing.listing_user }}</i> on <i>{{ listing.listing_date }}</i></small>
+            <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> on <i>{{ listing.listing_date }}</i></small>
         </div>
     </div>
+    {% if user.is_authenticated %}
+    {% if listing.listing_closed == False %}
     <div class="comment_section">
         <form name='comment' action="" method="post">
             {% csrf_token %}
@@ -48,14 +54,25 @@
                 <button name="comment" id="comment_button" class="btn btn-primary" type="submit">Comment</button>
             </div>
         </form>
+    {% endif %}
     </div>
-
+    {% endif %}
+    <h1>Comments</h1>
     {% for comment in comments %}
-        <p>{{ comment.comment_user }}</p>
-        <p>{{ comment.comment_comment }}</p>
+        <div class="comment-box">
+            <div class="comment-left">
+                <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
+            </div>
+            <div class="comment-right">
+                <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
+                <p class="comment-text">{{ comment.comment_comment }}</p>
+            </div>
+        </div>
+    {% empty %}
+    <p>No comments yet</p>
     {% endfor %}
 
-    {% if listing.listing_user == request.user and listing.listing_closed == False %}
+    {% if listing.listing_user == request.user.profile and listing.listing_closed == False %}
     <div class="close-form">
         <form name="close" action="" method="post">
             {% csrf_token %}

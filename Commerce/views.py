@@ -75,7 +75,7 @@ def listing_detail(request, listing_id):
      starting_price = listing_object.listing_price
      bid_price = listing_object.listing_bid_price
      current_bidder = Bid.objects.filter(bidding_listing=listing_object).last()
-     comments = Comments.objects.filter(comment_listing=listing_object).all()
+     comments = Comments.objects.filter(comment_listing=listing_object).order_by('comment_time').all()
      if request.method == 'POST':
           # organizing post requests by form and passing variables to bid and comment views
           if 'bid' in request.POST:
@@ -108,7 +108,7 @@ def listing_detail(request, listing_id):
                     'formy' : formy,
                     'comments': comments,
                     'starting_price': starting_price,
-                    'bid_count': listing_object.bidding_count,
+                    'bid_count': listing_object.bidding_count
           })
 
 def process_bid(request, listing_object, starting_price, bid_price):      
@@ -145,7 +145,26 @@ def process_comment(request, listing_object):
           new_comment = formy.save(commit=False)
           new_comment.comment_user = request.user.profile
           new_comment.comment_listing = listing_object
+          new_comment.comment_time = datetime.now()
           new_comment.save()
+
+def like_comment(request, comment_id):
+     if request.method == "POST":
+          comment = Comments.objects.get(id=comment_id)
+          comment_liker = request.POST['like']
+          comment.comment_likes.add(comment_liker)
+          comment.save()
+          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+     
+def unlike_comment(request, comment_id):
+     if request.method == "POST":
+          comment = Comments.objects.get(id=comment_id)
+          comment_unliker = request.POST['unlike']
+          comment.comment_likes.remove(comment_unliker)
+          comment.save()
+          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+
 
 def wishlist(request):
      # display wishlist items of the specific user signed in 

@@ -73,6 +73,8 @@ class Comments(models.Model):
     comment_user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='comment_user')
     comment_comment = models.CharField(max_length = 300)
     comment_listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='listing_comment', blank=True, null=True)
+    comment_time = models.DateTimeField(blank=True, null=True)
+    comment_likes = models.ManyToManyField(Profile, related_name= 'comment_like', blank=True)
 
     def __str__(self):
         return f"{self.comment_comment}"

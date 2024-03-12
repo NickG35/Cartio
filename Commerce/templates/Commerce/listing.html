@@ -1,5 +1,5 @@
 {% extends "Commerce/layout.html" %}
-
+{% load humanize %}
 {% block body %}
 {% for listing in listings %}
     <div id="image-container" class="container">
@@ -41,7 +41,7 @@
             <p>{{ listing.bidding_count }} bid(s) on this item.</p>
             <p>{{ listing.listing_description }}</p>
             <p>Category: {{ listing.listing_category }}</p>
-            <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> on <i>{{ listing.listing_date }}</i></small>
+            <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> {{ listing.listing_date|naturaltime }}</small>
         </div>
     </div>
     {% if user.is_authenticated %}
@@ -70,6 +70,25 @@
             <div class="comment-right">
                 <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
                 <p class="comment-text">{{ comment.comment_comment }}</p>
+                {% if request.user.profile in comment.comment_likes.all %}
+                    <form action="{% url 'unlike_comment' comment_id=comment.id %}" method="post">
+                        {% csrf_token %}
+                        <input name="unlike" type="hidden" value="{{ request.user.profile.id }}">
+                        <button type="submit">Unlike</button>
+                    </form>
+                {% else %}
+                    <form action="{% url 'like_comment' comment_id=comment.id %}" method="post">
+                        {% csrf_token %}
+                        <input name="like" type="hidden" value="{{ request.user.profile.id }}">
+                        <button type="submit">Like</button>
+                    </form>
+                {% endif %}
+                {% if comment.comment_likes.all|length != 0 %}
+                    <p>{{ comment.comment_likes.all|length }}</p>
+                {% else %}
+                    <p></p>
+                {% endif %}
+                <p><small>{{ comment.comment_time|naturaltime }}</small></p>
             </div>
         </div>
     {% empty %}

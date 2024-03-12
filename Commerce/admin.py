@@ -6,12 +6,23 @@ from .models import User, Listing, Comments, Bid, Profile
 class ProfileInline(admin.StackedInline):
     model= Profile
 
+class CommentInline(admin.StackedInline):
+    model= Comments
+
 class UserAdmin(admin.ModelAdmin):
     model = User
     fields = ["username"]
     inlines = [ProfileInline]
 
+class ListingAdmin(admin.ModelAdmin):
+    model = Listing
+    list_display = ('listing_name', 'listing_description', 'listing_price', 'listing_category', 'listing_closed', 'bidding_count', 'listing_user', 'listing_date')
+    inlines = [CommentInline]
+
+class BidAdmin(admin.ModelAdmin):
+    model = Bid
+    list_display = ('bidding_listing', 'bidding_price', 'bidding_user')
+
 admin.site.register(User, UserAdmin)
-admin.site.register(Listing)
-admin.site.register(Comments)
-admin.site.register(Bid)
+admin.site.register(Listing, ListingAdmin)
+admin.site.register(Bid, BidAdmin)

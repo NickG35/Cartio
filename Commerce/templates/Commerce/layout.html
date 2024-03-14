@@ -53,6 +53,18 @@
                         <a class="nav-link" href="{% url 'closed_listing' %}">Closed listings</a>
                       </li>
                     </ul>
+                      <div class="btn-group dropstart">
+                        <button data-bs-toggle="dropdown" aria-expanded="false">                  
+                          <i class="fa-regular fa-bell fa-xl"></i>
+                        </button>
+                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                            {% for notif in notifs %}
+                              <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
+                            {% endfor %}
+                            <li><a class="dropdown-item" href="#">Another action</a></li>
+                            <li><a class="dropdown-item" href="#">Something else here</a></li>
+                          </ul>
+                      </div>
                     {% if user.is_authenticated %}
                     <span class="navbar-text">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>

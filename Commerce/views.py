@@ -17,7 +17,7 @@ def index(request):
     })
 
 def notifications(request):
-     active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
+     active_notif = Notifications.objects.filter(noti_user=request.user.profile).order_by('-time').all()
      return render(request, 'Commerce/layout.html', {
           'notifs': active_notif
      })
@@ -68,6 +68,12 @@ def profile(request, profile_id):
                'listings': profile_listings,
                'wins': listing_wins
           })
+
+def comment(request, comment_id):
+     comment_info = Comments.objects.filter(id=comment_id).all()
+     return render(request, 'Commerce/comment.html', {
+          'comments': comment_info
+     })
 
 def create_listing(request):
      if request.method == "POST":
@@ -171,6 +177,8 @@ def like_comment(request, comment_id):
           comment_liker = request.POST['like']
           comment.comment_likes.add(comment_liker)
           comment.save()
+          liker_profile = Profile.objects.get(user_id=request.user.id)
+          Notifications.objects.create(noti_user=comment.comment_user, noti_like=liker_profile, noti_time = datetime.now(), noti_comment=comment)
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      
 def unlike_comment(request, comment_id):
@@ -179,6 +187,8 @@ def unlike_comment(request, comment_id):
           comment_unliker = request.POST['unlike']
           comment.comment_likes.remove(comment_unliker)
           comment.save()
+          liker_profile = Profile.objects.get(user_id=request.user.id)
+          Notifications.objects.filter(noti_user=comment.comment_user, noti_like=liker_profile, noti_comment=comment, noti_time = datetime.now()).delete()
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

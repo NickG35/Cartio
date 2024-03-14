@@ -4,7 +4,7 @@ from django.db import IntegrityError
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.http import HttpResponse, HttpResponseRedirect
-from .models import User, Listing, Comments, Bid, Profile
+from .models import User, Listing, Comments, Bid, Profile, Notifications
 from .forms import CreateListing, CategoryForm, BidForm, CommentForm, EditProfileForm
 from datetime import datetime 
 from django.core.exceptions import ValidationError
@@ -13,13 +13,22 @@ def index(request):
     # display all listings that were created by all users
     active_listings = Listing.objects.filter(listing_closed=False).all()
     return render(request, 'Commerce/index.html', {
-          'active_listings': active_listings
+          'active_listings': active_listings,
     })
+
+def notifications(request):
+     active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
+     return render(request, 'Commerce/layout.html', {
+          'notifs': active_notif
+     })
 
 def profile(request, profile_id):
      profile_user = Profile.objects.get(user_id=profile_id)
      profile_listings = Listing.objects.filter(listing_user=profile_user).all()
      listing_wins = Listing.objects.filter(listing_bid_winner=profile_user).all()
+
+     
+
      if request.method == 'POST':
           if 'profile_pic' in request.FILES:
                editprofileform = EditProfileForm(request.FILES)
@@ -35,11 +44,19 @@ def profile(request, profile_id):
                     profile_user.save()
 
           elif 'unfollow' in request.POST:
-               follower = request.POST['follower']
-               profile_user.followed_by.remove(follower)
+               follower_id = request.POST['follower']
+               follower_profile = Profile.objects.get(user_id=request.user.id)
+               profile_user.followed_by.remove(follower_id)
+               Notifications.objects.filter(noti_user=profile_user, noti_follower=follower_profile).delete()
           elif 'follow' in request.POST:
-               follower = request.POST['follower']
-               profile_user.followed_by.add(follower)
+               follower_id = request.POST['follower']
+               follower_profile = Profile.objects.get(user_id=request.user.id)
+               profile_user.followed_by.add(follower_id)
+               Notifications.objects.create(noti_user=profile_user, noti_follower=follower_profile)
+               
+               # add notification user by getting noti_user = profile_user and noti_follower = follower
+
+              
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      else:
           editprofileform = EditProfileForm(instance=profile_user)

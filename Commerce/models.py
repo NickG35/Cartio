@@ -83,6 +83,7 @@ class Notifications(models.Model):
     noti_user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_user', blank=True, null=True)
     noti_follower = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_follower', blank=True, null=True)
     noti_like = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_like', blank=True, null=True)
+    noti_comment = models.ForeignKey(Comments, on_delete=models.CASCADE, related_name='notification_comment', blank=True, null=True)
     noti_bid = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_bid', blank=True, null=True)
     noti_winner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_winner', blank=True, null=True)
     noti_time = models.DateTimeField(blank=True, null=True)

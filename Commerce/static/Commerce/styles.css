@@ -508,6 +508,12 @@ then set the desired styles for .card-img. */
   font-weight: bold;
 }
 
+.dropstart {
+  margin-right: 30px;
+}
+
+
+
 
 
 

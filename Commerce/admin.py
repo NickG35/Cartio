@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import User, Listing, Comments, Bid, Profile
+from .models import User, Listing, Comments, Bid, Profile, Notifications
 # Register your models here.
 
 class ProfileInline(admin.StackedInline):
@@ -26,3 +26,4 @@ class BidAdmin(admin.ModelAdmin):
 admin.site.register(User, UserAdmin)
 admin.site.register(Listing, ListingAdmin)
 admin.site.register(Bid, BidAdmin)
+admin.site.register(Notifications)

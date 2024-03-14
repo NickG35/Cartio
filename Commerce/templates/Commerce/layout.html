@@ -59,10 +59,14 @@
                         </button>
                           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                             {% for notif in notifs %}
-                              <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
+                              {% if notif.noti_follower %}
+                                <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
+                              {% elif notif.noti_like %}
+                                <li><a class="dropdown-item" href="{% url 'comment' comment_id=notif.noti_comment.id %}">{{ notif.noti_like }} liked your comment '{{ notif.noti_comment }}'</a></li>
+                              {% else %}
+                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                              {% endif %}
                             {% endfor %}
-                            <li><a class="dropdown-item" href="#">Another action</a></li>
-                            <li><a class="dropdown-item" href="#">Something else here</a></li>
                           </ul>
                       </div>
                     {% if user.is_authenticated %}

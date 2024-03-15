@@ -24,6 +24,7 @@ class BidAdmin(admin.ModelAdmin):
     list_display = ('bidding_listing', 'bidding_price', 'bidding_user')
 
 admin.site.register(User, UserAdmin)
+admin.site.register(Profile)
 admin.site.register(Listing, ListingAdmin)
 admin.site.register(Bid, BidAdmin)
 admin.site.register(Notifications)

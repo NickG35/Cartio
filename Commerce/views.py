@@ -160,6 +160,7 @@ def process_bid(request, listing_object, starting_price, bid_price):
           listing_object.save()
           # update user bid information when form is submitted
           new_bid.save()
+          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object)
           
 def process_comment(request, listing_object):
      # comment form allows users to post their comments on a listing
@@ -188,7 +189,7 @@ def unlike_comment(request, comment_id):
           comment.comment_likes.remove(comment_unliker)
           comment.save()
           liker_profile = Profile.objects.get(user_id=request.user.id)
-          Notifications.objects.filter(noti_user=comment.comment_user, noti_like=liker_profile, noti_comment=comment, noti_time = datetime.now()).delete()
+          Notifications.objects.filter(noti_user=comment.comment_user, noti_like=liker_profile).delete()
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

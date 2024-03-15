@@ -53,22 +53,26 @@
                         <a class="nav-link" href="{% url 'closed_listing' %}">Closed listings</a>
                       </li>
                     </ul>
-                      <div class="btn-group dropstart">
-                        <button data-bs-toggle="dropdown" aria-expanded="false">                  
-                          <i class="fa-regular fa-bell fa-xl"></i>
-                        </button>
-                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                            {% for notif in notifs %}
-                              {% if notif.noti_follower %}
-                                <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
-                              {% elif notif.noti_like %}
-                                <li><a class="dropdown-item" href="{% url 'comment' comment_id=notif.noti_comment.id %}">{{ notif.noti_like }} liked your comment '{{ notif.noti_comment }}'</a></li>
-                              {% else %}
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                              {% endif %}
-                            {% endfor %}
-                          </ul>
-                      </div>
+                    {% if user.is_authenticated %}
+                        <div class="btn-group dropstart">
+                          <button data-bs-toggle="dropdown" aria-expanded="false">                  
+                            <i class="fa-regular fa-bell fa-xl"></i>
+                          </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                              {% for notif in notifs %}
+                                {% if notif.noti_follower %}
+                                  <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
+                                {% elif notif.noti_like %}
+                                  <li><a class="dropdown-item" href="{% url 'comment' comment_id=notif.noti_comment.id %}">{{ notif.noti_like }} liked your comment '{{ notif.noti_comment }}'</a></li>
+                                {% elif notif.noti_bid %}
+                                  <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">{{ notif.noti_bid }} has just bid on your listing <i>{{notif.noti_listing }}</i></a></li>                         
+                                {% endif %}
+                              {% empty %}
+                                <li><a class="dropdown-item" href="">No notifications to display</a></li>
+                              {% endfor %}
+                            </ul>
+                        </div>
+                      {% endif %}
                     {% if user.is_authenticated %}
                     <span class="navbar-text">
                         <a class="nav-link" href="{% url 'logout' %}">Logout</a>

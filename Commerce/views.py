@@ -26,8 +26,8 @@ def profile(request, profile_id):
      profile_user = Profile.objects.get(user_id=profile_id)
      profile_listings = Listing.objects.filter(listing_user=profile_user).all()
      listing_wins = Listing.objects.filter(listing_bid_winner=profile_user).all()
-
-     
+     followers = profile_user.follow.all()
+     following = profile_user.followed_by.all
 
      if request.method == 'POST':
           if 'profile_pic' in request.FILES:
@@ -66,7 +66,9 @@ def profile(request, profile_id):
                'profile_user': profile_user,
                'editprofileform': editprofileform,
                'listings': profile_listings,
-               'wins': listing_wins
+               'wins': listing_wins,
+               'followers': followers,
+               'followings': following
           })
 
 def comment(request, comment_id):

@@ -105,14 +105,68 @@
     <div class="followed">
         <div class="follow-left">
             <p><b>Followers</b></p>
-            <p>{{ profile.followed_by.all|length }}</p>
+            <a class="follow-links" data-bs-toggle="modal" data-bs-target="#following_label">{{ profile.followed_by.all|length }}</a>
+
+            <div class="modal fade" id="following_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+                    <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="following_label">Modal title</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                      {% for following in followings %}
+                          {% if following.user.profile.profile_pic %}
+                              <img src="{{ following.user.profile.profile_pic.url }}">
+                          {% else %}
+                              <img src="../media/images/default_profile.png">
+                          {% endif %}
+                          <a href="{% url 'profile' profile_id=following.user.id %}">{{ following.user.profile }}</a>
+                        {% empty %}
+                        No followers yet
+                      {% endfor %}
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
         </div>
         <div class="follow-right">
             <p><b>Following</b></p>
-            <p>{{ profile.follow.all|length }}</p>
+            <a class="follow-links" data-bs-toggle="modal" data-bs-target="#followers_label">{{ profile.follow.all|length }}</a>
+          
+            <!-- Modal -->
+            <div class="modal fade" id="followers_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    {% for follower in followers %}
+                        {% if follower.user.profile.profile_pic %}
+                            <img src="{{ follower.user.profile.profile_pic.url }}">
+                        {% else %}
+                            <img src="../media/images/default_profile.png">
+                        {% endif %}
+                        <a href="{% url 'profile' profile_id=follower.user.id %}">{{ follower.user.profile }}</a>
+                    {% empty %}
+                        Following nobody
+                    {% endfor %}
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  </div>
+                </div>
+              </div>
+            </div>
         </div>
     </div>
 </div>
+
 <h2>Listings Posted</h2>
 <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
     {% for listing in listings %}

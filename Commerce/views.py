@@ -8,6 +8,11 @@ from .models import User, Listing, Comments, Bid, Profile, Notifications
 from .forms import CreateListing, CategoryForm, BidForm, CommentForm, EditProfileForm
 from datetime import datetime 
 from django.core.exceptions import ValidationError
+import json
+from django.http import JsonResponse
+from django.middleware.csrf import CsrfViewMiddleware
+from django.views.decorators.csrf import csrf_protect
+
 
 def index(request):
     # display all listings that were created by all users
@@ -17,7 +22,7 @@ def index(request):
     })
 
 def notifications(request):
-     active_notif = Notifications.objects.filter(noti_user=request.user.profile).order_by('-time').all()
+     active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
      return render(request, 'Commerce/layout.html', {
           'notifs': active_notif
      })
@@ -52,7 +57,7 @@ def profile(request, profile_id):
                follower_id = request.POST['follower']
                follower_profile = Profile.objects.get(user_id=request.user.id)
                profile_user.followed_by.add(follower_id)
-               Notifications.objects.create(noti_user=profile_user, noti_follower=follower_profile)
+               Notifications.objects.create(noti_user=profile_user, noti_follower=follower_profile, noti_time=datetime.now())
                
                # add notification user by getting noti_user = profile_user and noti_follower = follower
 
@@ -111,6 +116,7 @@ def listing_detail(request, listing_id):
                listing_object.listing_closed = True
                if current_bidder is not None:
                     listing_object.listing_bid_winner = current_bidder.bidding_user
+                    Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object, noti_time=datetime.now() )
                else:
                     listing_object.listing_bid_winner = listing_object.listing_user
                listing_object.save()
@@ -162,7 +168,7 @@ def process_bid(request, listing_object, starting_price, bid_price):
           listing_object.save()
           # update user bid information when form is submitted
           new_bid.save()
-          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object)
+          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_time=datetime.now())
           
 def process_comment(request, listing_object):
      # comment form allows users to post their comments on a listing
@@ -174,26 +180,23 @@ def process_comment(request, listing_object):
           new_comment.comment_time = datetime.now()
           new_comment.save()
 
-def like_comment(request, comment_id):
+@csrf_protect
+def like_toggle(request, comment_id):
      if request.method == "POST":
-          comment = Comments.objects.get(id=comment_id)
-          comment_liker = request.POST['like']
-          comment.comment_likes.add(comment_liker)
-          comment.save()
-          liker_profile = Profile.objects.get(user_id=request.user.id)
-          Notifications.objects.create(noti_user=comment.comment_user, noti_like=liker_profile, noti_time = datetime.now(), noti_comment=comment)
-          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-     
-def unlike_comment(request, comment_id):
-     if request.method == "POST":
-          comment = Comments.objects.get(id=comment_id)
-          comment_unliker = request.POST['unlike']
-          comment.comment_likes.remove(comment_unliker)
-          comment.save()
-          liker_profile = Profile.objects.get(user_id=request.user.id)
-          Notifications.objects.filter(noti_user=comment.comment_user, noti_like=liker_profile).delete()
-          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+          user = request.user.profile.id
+          comments = Comments.objects.get(id=comment_id)
+          comments.comment_likes.add(user)
+          comments.save()
+          return JsonResponse({"data": {"likes":comments.comment_likes.count()}})
 
+@csrf_protect
+def unlike_toggle(request, comment_id):
+     if request.method == "POST":
+          user = request.user.profile.id
+          comments = Comments.objects.get(id=comment_id)
+          comments.comment_likes.remove(user)
+          comments.save()
+          return JsonResponse({"data": {"likes":comments.comment_likes.count()}})
 
 
 def wishlist(request):

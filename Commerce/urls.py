@@ -12,7 +12,7 @@ urlpatterns = [
     path('wishlist', views.wishlist, name='wishlist'),
     path('categories', views.category, name='category'),
     path('closed_listings', views.closed_listing, name='closed_listing'),
-    path("like_comment/<int:comment_id>", views.like_comment, name= "like_comment"),
-    path("unlike_comment/<int:comment_id>", views.unlike_comment, name= "unlike_comment"),
+    path("like_toggle/<int:comment_id>", views.like_toggle, name= "like_toggle"),
+    path("unlike_toggle/<int:comment_id>", views.unlike_toggle, name= "unlike_toggle"),
     path("comment/<int:comment_id>", views.comment, name="comment")
 ]

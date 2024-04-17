@@ -1,6 +1,69 @@
 {% extends "Commerce/layout.html" %}
 {% load humanize %}
 {% block body %}
+
+<script>     
+    function toggleLike(id) {
+        const likeCount = document.getElementById(`like_count${id}`);
+        const likeButton = document.querySelector(`#like_button${id}`);
+
+        fetch(`/like_toggle/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{
+            return response.json()
+        }) 
+        .then(data => {
+            likeCount.innerHTML = data.data.likes;
+            console.log('Like:', data);
+        })
+        .catch(error => console.log('ERROR'))
+    }
+    function toggleUnlike(id) {
+        const likeCount = document.getElementById(`like_count${id}`);
+        const unlikeButton = document.querySelector(`#unlike_button${id}`);
+
+        fetch(`/unlike_toggle/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{
+            return response.json()
+        }) 
+        .then(data => {
+            likeCount.innerHTML = data.data.likes;
+            console.log('Unlike:', data);
+        })
+        .catch(error => console.log('Error:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const likeButtons = document.querySelectorAll('.like-button');
+        likeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                let commentId = button.getAttribute('data-comment');
+                currentState = button.getAttribute('data-state');
+                if (currentState === 'like') {
+                    toggleLike(commentId);
+                    button.setAttribute('data-state', 'unlike');
+                    button.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+                } else if (currentState === 'unlike') {
+                    toggleUnlike(commentId);
+                    button.setAttribute('data-state', 'like');
+                    button.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+                }
+            });
+        });
+    });
+
+</script>
 {% for listing in listings %}
     <div id="image-container" class="container">
         <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
@@ -70,24 +133,24 @@
             <div class="comment-right">
                 <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
                 <p class="comment-text">{{ comment.comment_comment }}</p>
-                {% if request.user.profile in comment.comment_likes.all %}
-                    <form action="{% url 'unlike_comment' comment_id=comment.id %}" method="post">
-                        {% csrf_token %}
-                        <input name="unlike" type="hidden" value="{{ request.user.profile.id }}">
-                        <button type="submit">Unlike</button>
-                    </form>
-                {% else %}
-                    <form action="{% url 'like_comment' comment_id=comment.id %}" method="post">
-                        {% csrf_token %}
-                        <input name="like" type="hidden" value="{{ request.user.profile.id }}">
-                        <button type="submit">Like</button>
-                    </form>
-                {% endif %}
-                {% if comment.comment_likes.all|length != 0 %}
-                    <p>{{ comment.comment_likes.all|length }}</p>
-                {% else %}
-                    <p></p>
-                {% endif %}
+                <div class="like-area">
+                    {% if request.user.profile in comment.comment_likes.all %}
+                        <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                            {% csrf_token %}
+                            <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
+                                <i class="fa-solid fa-thumbs-up"></i>
+                            </button>
+                        </form>
+                    {% else %}
+                        <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                            {% csrf_token %}
+                            <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                                <i class="fa-regular fa-thumbs-up"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                    <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p>        
+                </div>
                 <p><small>{{ comment.comment_time|naturaltime }}</small></p>
             </div>
         </div>

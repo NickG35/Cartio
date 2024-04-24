@@ -22,7 +22,7 @@
 <body>
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
-                  <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src="media/images/navlogo.jpg"></a>
+                  <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src='media/images/navlogo.jpg'></a>
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>
@@ -57,15 +57,23 @@
                         <div class="btn-group dropstart">
                           <button data-bs-toggle="dropdown" aria-expanded="false">                  
                             <i class="fa-regular fa-bell fa-xl"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                              {{ notifs|length }} 
+                              <span class="visually-hidden">unread messages</span>
+                            </span>
                           </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                              {% for notif in notifs %}
+                              {% for notif in notifs|dictsortreversed:"noti_time" %}
                                 {% if notif.noti_follower %}
                                   <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
-                                {% elif notif.noti_like %}
-                                  <li><a class="dropdown-item" href="{% url 'comment' comment_id=notif.noti_comment.id %}">{{ notif.noti_like }} liked your comment '{{ notif.noti_comment }}'</a></li>
                                 {% elif notif.noti_bid %}
-                                  <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">{{ notif.noti_bid }} has just bid on your listing <i>{{notif.noti_listing }}</i></a></li>                         
+                                  {% if notif.noti_bid == request.user.profile %}
+                                    <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">You just bid on your listing <i>{{notif.noti_listing }}</i></a></li>
+                                  {% else %}
+                                    <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">{{ notif.noti_bid }} has just bid on your listing <i>{{notif.noti_listing }}</i></a></li>   
+                                  {% endif %}
+                                {% elif notif.noti_winner %}
+                                  <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">Congratulations, {{ notif.noti_winner }}! You just won the auction <i>{{notif.noti_listing }}.</i></a></li>                         
                                 {% endif %}
                               {% empty %}
                                 <li><a class="dropdown-item" href="">No notifications to display</a></li>

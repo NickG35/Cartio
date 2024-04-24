@@ -2,6 +2,66 @@
 
 {% block body %}
 <script>
+    function Follow(id) {
+        let FollowerCount = document.querySelector(`#followers${id}`);
+        let FollowingCount = document.querySelector(`#following${id}`);
+        let newImg = document.createElement('img');
+        let newLink = document.createElement('a');
+        let modalBody = document.querySelector(`.modal-body${id}`);
+        newImg.id = `followerpfp${id}`;
+        newLink.id = `followername${id}`;
+    
+
+        fetch(`/follow/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{
+            return response.json()
+        }) 
+        .then(data => {
+            FollowerCount.innerHTML = data.data.followers;
+            FollowingCount.innerHTML = data.data.following;
+            newLink.innerHTML = data.data.follow_user;
+            newImg.src = data.data.follower_pfp;
+            newImg.id = `followerpfp${data.data.follower_id}`;
+            newLink.id = `followername${data.data.follower_id}`;
+            modalBody.appendChild(newImg);
+            modalBody.appendChild(newLink);
+            console.log('Followers:', data.data.followers, 'Following:', data.data.following, newImg.id, newLink.id)
+        })
+        .catch(error => console.log('ERROR:', error))
+    }
+
+    function Unfollow(id) {
+        let FollowerCount = document.querySelector(`#followers${id}`);
+        let FollowingCount = document.querySelector(`#following${id}`);
+        fetch(`/unfollow/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{
+            return response.json()
+        }) 
+        .then(data => {
+            FollowerCount.innerHTML = data.data.followers;
+            FollowingCount.innerHTML = data.data.following;
+            newImg = document.querySelector(`#followerpfp${data.data.follower_id}`);
+            newLink = document.querySelector(`#followername${data.data.follower_id}`);
+            newImg.src = data.data.follower_pfp;
+            newImg.remove();
+            newLink.remove();
+            console.log('Followers:', data.data.followers, 'Following:', data.data.following, newImg.id, newLink.id)
+        })
+        .catch(error => console.log('ERROR'))
+    }
+
     document.addEventListener('DOMContentLoaded' , function(){
         // select file input element
         var fileInput = document.getElementById('change_pic');
@@ -24,6 +84,23 @@
                 reader.readAsDataURL(file)
             };
 
+        });
+
+        const followButtons = document.querySelectorAll('#followb');
+        followButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                let FollowId = button.getAttribute('data-follow');
+                currentState = button.getAttribute('data-state');
+                if (currentState === 'follow') {
+                    Follow(FollowId);
+                    button.setAttribute('data-state', 'unfollow');
+                    button.innerHTML = 'Following';
+                } else if (currentState === 'unfollow') {
+                    Unfollow(FollowId);
+                    button.setAttribute('data-state', 'follow');
+                    button.innerHTML = 'Follow';  
+                }
+            });
         });
         
     })
@@ -86,26 +163,26 @@
     {% endif %}
 </div>
 <div class="follow-area">
-    {% if user.is_authenticated %}
-        {% if request.user.profile in profile.followed_by.all %}
-            <form name="unfollow" action="" method="post">
-                {% csrf_token %}
-                <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
-                <button name="unfollow" type="submit" class="btn btn-primary">Following</button>
-            </form>
-        {% else %}
-            <form name="follow" action="" method="post">
-                {% csrf_token %}
-                <input name="follower" type="hidden" value="{{ request.user.profile.id }}">
-                <button name="follow" type="submit" class="btn btn-primary">Follow</button>
-            </form>
+    {% if request.user.profile != profile %}
+        {% if user.is_authenticated %}
+            {% if request.user.profile in profile.followed_by.all %}
+                <form name="unfollow" action="" method="post">
+                    {% csrf_token %}
+                    <button id="followb" name="unfollow" type="button" class="btn btn-primary" data-follow="{{profile.user_id}}" data-state="unfollow">Following</button>
+                </form>
+            {% else %}
+                <form name="follow" action="" method="post">
+                    {% csrf_token %}
+                    <button id="followb" name="follow" type="button" class="btn btn-primary" data-follow="{{profile.user_id}}" data-state="follow">Follow</button>
+                </form>
+            {% endif %}
         {% endif %}
     {% endif %}
 
     <div class="followed">
         <div class="follow-left">
             <p><b>Followers</b></p>
-            <a class="follow-links" data-bs-toggle="modal" data-bs-target="#following_label">{{ profile.followed_by.all|length }}</a>
+            <a id='followers{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#following_label">{{ profile.followed_by.all|length }}</a>
 
             <div class="modal fade" id="following_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                 <div class="modal-dialog">
@@ -114,14 +191,14 @@
                       <h1 class="modal-title fs-5" id="following_label">Modal title</h1>
                       <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
+                    <div class="modal-body{{profile.user_id}}">
                       {% for following in followings %}
                           {% if following.user.profile.profile_pic %}
-                              <img src="{{ following.user.profile.profile_pic.url }}">
+                              <img id="followerpfp{{following.user.id}}" src="{{ following.user.profile.profile_pic.url }}">
                           {% else %}
-                              <img src="../media/images/default_profile.png">
+                              <img id="followerpfp{{following.user.id}}" src="../media/images/default_profile.png">
                           {% endif %}
-                          <a href="{% url 'profile' profile_id=following.user.id %}">{{ following.user.profile }}</a>
+                          <a id="followername{{following.user.id}}" href="{% url 'profile' profile_id=following.user.id %}">{{ following.user.profile }}</a>
                         {% empty %}
                         No followers yet
                       {% endfor %}
@@ -135,7 +212,7 @@
         </div>
         <div class="follow-right">
             <p><b>Following</b></p>
-            <a class="follow-links" data-bs-toggle="modal" data-bs-target="#followers_label">{{ profile.follow.all|length }}</a>
+            <a id='following{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#followers_label">{{ profile.follow.all|length }}</a>
           
             <!-- Modal -->
             <div class="modal fade" id="followers_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

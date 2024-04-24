@@ -14,13 +14,13 @@
             <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
             <p class="comment-text">{{ comment.comment_comment }}</p>
             {% if request.user.profile in comment.comment_likes.all %}
-                <form action="{% url 'unlike_comment' comment_id=comment.id %}" method="post">
+                <form action="{% url 'unlike_toggle' comment_id=comment.id %}" method="post">
                     {% csrf_token %}
                     <input name="unlike" type="hidden" value="{{ request.user.profile.id }}">
                     <button type="submit">Unlike</button>
                 </form>
             {% else %}
-                <form action="{% url 'like_comment' comment_id=comment.id %}" method="post">
+                <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
                     {% csrf_token %}
                     <input name="like" type="hidden" value="{{ request.user.profile.id }}">
                     <button type="submit">Like</button>

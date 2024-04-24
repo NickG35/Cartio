@@ -46,29 +46,13 @@ def profile(request, profile_id):
                if editprofileform.is_valid():
                     bio = editprofileform.cleaned_data['bio']
                     profile_user.bio = bio
-                    profile_user.save()
-
-          elif 'unfollow' in request.POST:
-               follower_id = request.POST['follower']
-               follower_profile = Profile.objects.get(user_id=request.user.id)
-               profile_user.followed_by.remove(follower_id)
-               Notifications.objects.filter(noti_user=profile_user, noti_follower=follower_profile).delete()
-          elif 'follow' in request.POST:
-               follower_id = request.POST['follower']
-               follower_profile = Profile.objects.get(user_id=request.user.id)
-               profile_user.followed_by.add(follower_id)
-               Notifications.objects.create(noti_user=profile_user, noti_follower=follower_profile, noti_time=datetime.now())
-               
-               # add notification user by getting noti_user = profile_user and noti_follower = follower
-
-              
+                    profile_user.save()           
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      else:
           editprofileform = EditProfileForm(instance=profile_user)
           profile = Profile.objects.get(user_id=profile_id)
           return render(request, 'Commerce/profile.html', {
                'profile': profile,
-               'profile_user': profile_user,
                'editprofileform': editprofileform,
                'listings': profile_listings,
                'wins': listing_wins,
@@ -180,6 +164,26 @@ def process_comment(request, listing_object):
           new_comment.comment_time = datetime.now()
           new_comment.save()
 
+def follow(request, profile_id):
+     if request.method == "POST":
+          profile_user = Profile.objects.get(user_id=profile_id)
+          follower_id = request.user.profile
+          follow_id = request.user.profile.user_id
+          profile_user.followed_by.add(follower_id)
+          follower_profile = Profile.objects.get(user_id=follow_id)
+          profile_user.save()
+          return JsonResponse({"data": {"followers": profile_user.followed_by.count(), "following": profile_user.follow.count(), "follower_id":follower_profile.user_id, "follower_pfp": follower_profile.profile_pic.url, "follow_user": follower_profile.user.username}})
+
+def unfollow(request, profile_id):
+     if request.method == "POST":
+          profile_user = Profile.objects.get(user_id=profile_id)
+          follower_id = request.user.profile
+          follow_id = request.user.profile.user_id
+          profile_user.followed_by.remove(follower_id)
+          follower_profile = Profile.objects.get(user_id=follow_id)
+          profile_user.save()
+          return JsonResponse({"data": {"followers": profile_user.followed_by.count(), "following":profile_user.follow.count(), "follower_id":follower_profile.user_id, "follower_pfp": follower_profile.profile_pic.url, "follow_user": follower_profile.user.username}})
+
 @csrf_protect
 def like_toggle(request, comment_id):
      if request.method == "POST":
@@ -277,4 +281,4 @@ def login_view(request):
 def logout_view(request):
      # log user out of site
      logout(request)
-     return HttpResponseRedirect(reverse("index"))
+     return HttpResponseRedirect(reverse("login"))

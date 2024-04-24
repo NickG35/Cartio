@@ -5,7 +5,6 @@
 <script>     
     function toggleLike(id) {
         const likeCount = document.getElementById(`like_count${id}`);
-        const likeButton = document.querySelector(`#like_button${id}`);
 
         fetch(`/like_toggle/${id}`, {
             method: 'POST',
@@ -25,7 +24,6 @@
     }
     function toggleUnlike(id) {
         const likeCount = document.getElementById(`like_count${id}`);
-        const unlikeButton = document.querySelector(`#unlike_button${id}`);
 
         fetch(`/unlike_toggle/${id}`, {
             method: 'POST',
@@ -70,16 +68,18 @@
         <div class="inner-container">
             <div id="header-container" class="container">
                 <h1 class="header">{{ listing.listing_name }}</h1>
-                {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
-                <form name="remove_wishlist" action="" method="post">
-                    {% csrf_token %}
-                    <button name="remove_wishlist" type="submit" class="btn btn-light"><i class="fa-solid fa-clock" style="color: #8c00ff;"></i></button>
-                </form>
-                {%  elif request.user.profile not in listing.listing_wishlist.all and listing.listing_closed == False  %}
-                    <form name="add_wishlist" action=""  method="post">
+                {% if user.is_authenticated %}
+                    {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
+                    <form name="remove_wishlist" action="" method="post">
                         {% csrf_token %}
-                        <button name="add_wishlist" type="submit" class="btn btn-light"><i class="fa-regular fa-clock" style="color: #8c00ff;"></i></button>
+                        <button name="remove_wishlist" type="submit" class="btn btn-light"><i class="fa-solid fa-clock" style="color: #8c00ff;"></i></button>
                     </form>
+                    {%  elif request.user.profile not in listing.listing_wishlist.all and listing.listing_closed == False  %}
+                        <form name="add_wishlist" action=""  method="post">
+                            {% csrf_token %}
+                            <button name="add_wishlist" type="submit" class="btn btn-light"><i class="fa-regular fa-clock" style="color: #8c00ff;"></i></button>
+                        </form>
+                    {% endif %}
                 {% endif %}
             </div>
             {% if user.is_authenticated %}
@@ -134,17 +134,26 @@
                 <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
                 <p class="comment-text">{{ comment.comment_comment }}</p>
                 <div class="like-area">
-                    {% if request.user.profile in comment.comment_likes.all %}
-                        <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
-                            {% csrf_token %}
-                            <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
-                                <i class="fa-solid fa-thumbs-up"></i>
-                            </button>
-                        </form>
+                    {% if user.is_authenticated %}
+                        {% if request.user.profile in comment.comment_likes.all %}
+                            <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                                {% csrf_token %}
+                                <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
+                                    <i class="fa-solid fa-thumbs-up"></i>
+                                </button>
+                            </form>
+                        {% else %}
+                            <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                                {% csrf_token %}
+                                <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                                    <i class="fa-regular fa-thumbs-up"></i>
+                                </button>
+                            </form>
+                        {% endif %}
                     {% else %}
-                        <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                        <form action="{% url 'logout' %}" method="post">
                             {% csrf_token %}
-                            <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                            <button  type="submit">
                                 <i class="fa-regular fa-thumbs-up"></i>
                             </button>
                         </form>

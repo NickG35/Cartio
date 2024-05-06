@@ -42,6 +42,108 @@
         .catch(error => console.log('Error:', error));
     }
 
+    function submitComment(id, comment_id) {
+        const commentValue = document.querySelector("#comment_form").value;
+        let commentArea = document.querySelector(`.comment-area${id}`);
+        
+        fetch(`/comment/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json',
+                'X-CSRFTOKEN': '{{csrf_token}}',
+            },
+            body: JSON.stringify({
+                comment_text: commentValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            let comment_id = data.data.comment_id;
+            document.getElementById('comment_form').value = "";
+            let commentBox = document.createElement('div');
+            let leftDiv = document.createElement('div');
+            let commentPic = document.createElement('img');
+            let rightDiv = document.createElement('div');
+            let commentUser = document.createElement('a');
+            let commentText = document.createElement('p');
+            let commentTime = document.createElement('p');
+            let likeArea = document.createElement('div');
+            let likeForm = document.createElement('form');
+            let likeButton = document.createElement('button');
+            let likeIcon = document.createElement('i');
+            let likeCount = document.createElement('p');
+            
+            commentBox.className = `comment-box${comment_id}`;
+            leftDiv.className = "comment-left";
+            commentPic.className = "comment-pic";
+            rightDiv.className = "comment-right";
+            commentUser.className = "comment-user";
+            commentText.className = "comment-text";
+            commentTime.className = "comment-time";
+            likeArea.className = "like-area";
+            likeForm.className = 'like-form';
+            likeButton.className = 'like-button';
+            likeButton.type = 'button';
+            likeButton.dataset.comment = comment_id;
+            likeButton.dataset.state = 'like';
+            likeButton.id = `like_button${comment_id}`;
+            likeIcon.className = 'fa-regular fa-thumbs-up';
+            likeCount.id = `like_count${comment_id}`;
+            likeCount.innerHTML = data.data.likes;
+            
+            commentUser.href = `/profile/${data.data.comment_user.user}`;
+            commentUser.innerHTML = data.data.comment_user;
+            commentText.innerHTML = data.data.comment_comment;
+            commentTime.innerHTML = `<small>${data.data.comment_time}</small>`;
+            commentPic.src =  data.data.comment_pic;
+
+            likeForm.action = `/like_toggle/${comment_id}/`;
+            likeForm.method = 'post';
+            commentPic.style.width = "45px";
+            commentPic.style.height = "45px";
+            commentPic.style.border = "1px solid lightgray";
+            rightDiv.appendChild(commentUser);
+            rightDiv.appendChild(commentText);
+            let csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = '{{ csrf_token }}';
+            likeForm.appendChild(csrfInput);
+            likeButton.appendChild(likeIcon);
+            likeForm.appendChild(likeButton);
+            likeArea.appendChild(likeForm);
+            likeArea.appendChild(likeCount);
+            rightDiv.appendChild(likeArea);
+            rightDiv.appendChild(commentTime);
+            rightDiv.appendChild(commentPic);
+            leftDiv.appendChild(commentPic);
+            leftDiv.style.display = 'flex';
+            commentBox.appendChild(leftDiv);
+            commentBox.appendChild(rightDiv);
+
+            commentArea.prepend(commentBox);
+
+            // Add event listener for like button
+            const likeButtons = document.querySelectorAll(`#like_button${comment_id}`);
+                likeButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        let commentId = comment_id;
+                        currentState = button.getAttribute('data-state');
+                        if (currentState === 'like') {
+                            toggleLike(commentId);
+                            button.setAttribute('data-state', 'unlike');
+                            button.innerHTML = '<i class="fa-solid fa-thumbs-up"></i>';
+                        } else if (currentState === 'unlike') {
+                            toggleUnlike(commentId);
+                            button.setAttribute('data-state', 'like');
+                            button.innerHTML = '<i class="fa-regular fa-thumbs-up"></i>';
+                        }
+                        console.log(currentState, commentId);
+                    });
+                });
+            })
+            .catch(error => console.error('Error:', error));
+}
     document.addEventListener('DOMContentLoaded', function() {
         const likeButtons = document.querySelectorAll('.like-button');
         likeButtons.forEach(button => {
@@ -59,6 +161,14 @@
                 }
             });
         });
+        const commentButton = document.querySelectorAll('.comment_submit');
+        commentButton.forEach(button => {
+            button.addEventListener('click', function(event){
+                event.preventDefault();
+                let listingId = button.getAttribute('data-listing');
+                submitComment(listingId);                     
+            })
+        })
     });
 
 </script>
@@ -110,63 +220,64 @@
     {% if user.is_authenticated %}
     {% if listing.listing_closed == False %}
     <div class="comment_section">
-        <form name='comment' action="" method="post">
+        <form class="comment_form" name='comment' action="" method="post">
             {% csrf_token %}
             {{ formy }}
             <div class="comment_button">
-                <button name="comment" id="comment_button" class="btn btn-primary" type="submit">Comment</button>
+                <button name="comment" id="comment_button{{listing.id}}" class="comment_submit" data-listing="{{listing.id}}" type="submit">Comment</button>
             </div>
         </form>
     {% endif %}
     </div>
     {% endif %}
     <h1>Comments</h1>
-    {% for comment in comments %}
-        <div class="comment-box">
-            <div class="comment-left">
-                {% if comment.comment_user.profile_pic %}
-                    <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
-                {% else %}
-                    <img class="comment-pic" src="../media/images/default_profile.png" alt="{{ comment.comment_user }}">
-                {% endif %}
-            </div>
-            <div class="comment-right">
-                <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
-                <p class="comment-text">{{ comment.comment_comment }}</p>
-                <div class="like-area">
-                    {% if user.is_authenticated %}
-                        {% if request.user.profile in comment.comment_likes.all %}
-                            <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
-                                {% csrf_token %}
-                                <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
-                                    <i class="fa-solid fa-thumbs-up"></i>
-                                </button>
-                            </form>
+    <div class="comment-area{{listing.id}}">
+        {% for comment in comments %}
+            <div class="comment-box{{comment.id}}">
+                <div class="comment-left">
+                    {% if comment.comment_user.profile_pic %}
+                        <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
+                    {% else %}
+                        <img class="comment-pic" src="../media/images/default_profile.png" alt="{{ comment.comment_user }}">
+                    {% endif %}
+                </div>
+                <div class="comment-right">
+                    <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
+                    <p class="comment-text">{{ comment.comment_comment }}</p>
+                    <div class="like-area">
+                        {% if user.is_authenticated %}
+                            {% if request.user.profile in comment.comment_likes.all %}
+                                <form  action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
+                                        <i class="fa-solid fa-thumbs-up"></i>
+                                    </button>
+                                </form>
+                            {% else %}
+                                <form class="like-form" action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                                    {% csrf_token %}
+                                    <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                                        <i class="fa-regular fa-thumbs-up"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
                         {% else %}
-                            <form action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
+                            <form action="{% url 'logout' %}" method="post">
                                 {% csrf_token %}
-                                <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                                <button  type="submit">
                                     <i class="fa-regular fa-thumbs-up"></i>
                                 </button>
                             </form>
                         {% endif %}
-                    {% else %}
-                        <form action="{% url 'logout' %}" method="post">
-                            {% csrf_token %}
-                            <button  type="submit">
-                                <i class="fa-regular fa-thumbs-up"></i>
-                            </button>
-                        </form>
-                    {% endif %}
-                    <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p>        
+                        <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p>        
+                    </div>
+                    <p class="comment-time"><small>{{ comment.comment_time|naturaltime }}</small></p>
                 </div>
-                <p><small>{{ comment.comment_time|naturaltime }}</small></p>
             </div>
-        </div>
-    {% empty %}
-    <p>No comments yet</p>
-    {% endfor %}
-
+        {% empty %}
+        <p>No comments yet</p>
+        {% endfor %}
+    </div>
     {% if listing.listing_user == request.user.profile and listing.listing_closed == False %}
     <div class="close-form">
         <form name="close" action="" method="post">

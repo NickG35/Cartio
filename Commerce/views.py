@@ -12,6 +12,7 @@ import json
 from django.http import JsonResponse
 from django.middleware.csrf import CsrfViewMiddleware
 from django.views.decorators.csrf import csrf_protect
+from django.contrib.humanize.templatetags.humanize import naturaltime
 
 
 def index(request):
@@ -60,12 +61,6 @@ def profile(request, profile_id):
                'followings': following
           })
 
-def comment(request, comment_id):
-     comment_info = Comments.objects.filter(id=comment_id).all()
-     return render(request, 'Commerce/comment.html', {
-          'comments': comment_info
-     })
-
 def create_listing(request):
      if request.method == "POST":
           # form that allows user to create their own listings
@@ -94,8 +89,6 @@ def listing_detail(request, listing_id):
           # organizing post requests by form and passing variables to bid and comment views
           if 'bid' in request.POST:
                process_bid(request, listing_object, starting_price, bid_price)
-          elif 'comment' in request.POST:
-               process_comment(request, listing_object)
           elif 'close' in request.POST:
                listing_object.listing_closed = True
                if current_bidder is not None:
@@ -154,15 +147,19 @@ def process_bid(request, listing_object, starting_price, bid_price):
           new_bid.save()
           Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_time=datetime.now())
           
-def process_comment(request, listing_object):
+def comment(request, listing_id):
      # comment form allows users to post their comments on a listing
-     formy = CommentForm(request.POST)
-     if formy.is_valid():
-          new_comment = formy.save(commit=False)
-          new_comment.comment_user = request.user.profile
-          new_comment.comment_listing = listing_object
-          new_comment.comment_time = datetime.now()
-          new_comment.save()
+     #add to database properly because html is only replacing the one comment instead of adding multiple
+     if request.method == "POST":
+          data = json.loads(request.body)
+          listing = Listing.objects.get(id=listing_id)
+          new_comment = Comments.objects.create(
+               comment_listing = listing,
+               comment_user = request.user.profile,
+               comment_comment = (data["comment_text"]),
+               comment_time = datetime.now()
+          )
+          return JsonResponse({"data": {"comment_pic":new_comment.comment_user.profile_pic.url, "comment_user": new_comment.comment_user.user.username, "comment_comment": new_comment.comment_comment, "comment_time": naturaltime(new_comment.comment_time), "likes":new_comment.comment_likes.count(), "comment_id":new_comment.id}})
 
 def follow(request, profile_id):
      if request.method == "POST":

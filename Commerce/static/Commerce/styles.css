@@ -498,7 +498,7 @@ then set the desired styles for .card-img. */
   text-decoration: underline;
 }
 
-.comment-box {
+div[class^="comment-box"] {
   display: flex;
   padding: 15px;
 }
@@ -519,6 +519,13 @@ then set the desired styles for .card-img. */
   text-decoration: underline;
 }
 
+.like-area {
+  display: flex;
+}
+
+.fa-solid {
+  margin-right: 5px;
+}
 
 
 

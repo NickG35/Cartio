@@ -396,13 +396,35 @@ function deleteComment(id){
         {% endfor %}
     </div>
     {% if listing.listing_user == request.user.profile and listing.listing_closed == False %}
-    <div class="close-form">
-        <form name="close" action="" method="post">
-            {% csrf_token %}
-            <button name="close" class="btn btn-danger" id="close_button" type="submit">Close Listing</button>
-        </form>
-    </div>
+        <div id="close-form">
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                Close Listing
+            </button>
+        </div>
     {% endif %}
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you sure?</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h3>This action cannot be undone.</h3>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <form name="close" action="" method="post">
+                        {% csrf_token %}
+                        <button name="close" class="btn btn-danger" type="submit">Yes</button>
+                    </form>
+                </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+        </div>
+    </div>
 
 {% endfor %}
 

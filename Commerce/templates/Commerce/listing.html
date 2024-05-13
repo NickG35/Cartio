@@ -42,6 +42,48 @@
         .catch(error => console.log('Error:', error));
     }
 
+    function addWishlist(id) {
+        let wishlistIcon = document.getElementById(`wish-button${id}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        fetch(`/add_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()
+        })
+        .then(data => {
+            console.log('Listing added to wishlist by:', data.data.user);
+        })
+        .catch(error =>console.log('Error:', error));
+    }
+
+    function removeWishlist(id) {
+        let wishlistIcon = document.getElementById(`wish-button${id}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        fetch(`/remove_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()
+        })
+        .then(data => {
+            console.log('Listing removed from wishlist by:', data.data.user);
+        })
+        .catch(error =>console.log('Error:', error));
+    }
+
     function submitComment(id, comment_id) {
         const commentValue = document.querySelector("#comment_form").value;
         let commentArea = document.querySelector(`.comment-area${id}`);
@@ -72,6 +114,8 @@
             let likeButton = document.createElement('button');
             let likeIcon = document.createElement('i');
             let likeCount = document.createElement('p');
+            let deleteButton = document.createElement('button');
+            let deleteIcon = document.createElement('i');
             
             commentBox.className = `comment-box${comment_id}`;
             leftDiv.className = "comment-left";
@@ -90,8 +134,14 @@
             likeIcon.className = 'fa-regular fa-thumbs-up';
             likeCount.id = `like_count${comment_id}`;
             likeCount.innerHTML = data.data.likes;
+            deleteButton.id = `delete_button${comment_id}`;
+            deleteButton.className = 'delete-button';
+            deleteButton.type = 'button';
+            deleteButton.dataset.comment = comment_id;
+            deleteIcon.className = 'fa-regular fa-trash-can';
+            deleteIcon.style.color = " #000000;";
             
-            commentUser.href = `/profile/${data.data.comment_user.user}`;
+            commentUser.href = `/profile/${data.data.user_id}`;
             commentUser.innerHTML = data.data.comment_user;
             commentText.innerHTML = data.data.comment_comment;
             commentTime.innerHTML = `<small>${data.data.comment_time}</small>`;
@@ -108,11 +158,19 @@
             csrfInput.type = 'hidden';
             csrfInput.name = 'csrfmiddlewaretoken';
             csrfInput.value = '{{ csrf_token }}';
+            deleteButton.appendChild(deleteIcon);
+            deleteButton.style.marginLeft = '55px';
+            deleteButton.addEventListener('click', function() {
+                deleteComment(comment_id);
+                let comment_box = deleteButton.closest(`comment-box${comment_id}`);
+
+            });
             likeForm.appendChild(csrfInput);
             likeButton.appendChild(likeIcon);
             likeForm.appendChild(likeButton);
             likeArea.appendChild(likeForm);
             likeArea.appendChild(likeCount);
+            likeArea.appendChild(deleteButton);
             rightDiv.appendChild(likeArea);
             rightDiv.appendChild(commentTime);
             rightDiv.appendChild(commentPic);
@@ -141,8 +199,40 @@
                         console.log(currentState, commentId);
                     });
                 });
+            const deleteButtons = document.querySelectorAll(`#delete_button${comment_id}`);
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(event) {
+                    deleteComment(comment_id); 
+                    let comment = button.closest(`.comment-box${comment_id}`);
+                    comment.style.animationName = 'hide';
+                    comment.style.animationDuration = '.8s';
+                    comment.style.animationFillMode = 'forwards';
+                    comment.style.animationPLayState = 'running';
+                    comment.addEventListener('animationend', function(){
+                        comment.remove();
+                    })
+                });
+            });
             })
             .catch(error => console.error('Error:', error));
+}
+
+function deleteComment(id){
+        let deleteButton = document.getElementById(`delete-button${id}`);
+        fetch(`/delete_comment/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then (response => {
+            return response.json()
+        })
+        .then(data => {
+            console.log(`comment '${data.data.comment}' deleted`);
+        })
+        .catch(error =>console.log('Error:', error));
 }
     document.addEventListener('DOMContentLoaded', function() {
         const likeButtons = document.querySelectorAll('.like-button');
@@ -169,6 +259,38 @@
                 submitComment(listingId);                     
             })
         })
+        const wishButtons = document.querySelectorAll('[id^="wish-button"]');
+        wishButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                let profileId = button.getAttribute('data-profile');
+                currentState = button.getAttribute('data-wishlist');
+                if (currentState === 'wish') {
+                    addWishlist(profileId);
+                    button.setAttribute('data-wishlist', 'wished');
+                    button.innerHTML = '<i class="fa-solid fa-clock" style="color: #8c00ff;"></i>';
+                } else if (currentState === 'wished') {
+                    removeWishlist(profileId);
+                    button.setAttribute('data-wishlist', 'wish');
+                    button.innerHTML = '<i class="fa-regular fa-clock" style="color: #8c00ff;"></i>';
+                }
+            });
+        });
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                let commentId = button.getAttribute('data-comment');
+                deleteComment(commentId); 
+                let comment = button.closest(`.comment-box${commentId}`);
+                comment.style.animationName = 'hide';
+                comment.style.animationDuration = '.8s';
+                comment.style.animationFillMode = 'forwards';
+                comment.style.animationPLayState = 'running';
+                comment.addEventListener('animationend', function(){
+                    comment.remove();
+                })
+            });
+        });
+    
     });
 
 </script>
@@ -180,15 +302,13 @@
                 <h1 class="header">{{ listing.listing_name }}</h1>
                 {% if user.is_authenticated %}
                     {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
-                    <form name="remove_wishlist" action="" method="post">
-                        {% csrf_token %}
-                        <button name="remove_wishlist" type="submit" class="btn btn-light"><i class="fa-solid fa-clock" style="color: #8c00ff;"></i></button>
-                    </form>
-                    {%  elif request.user.profile not in listing.listing_wishlist.all and listing.listing_closed == False  %}
-                        <form name="add_wishlist" action=""  method="post">
-                            {% csrf_token %}
-                            <button name="add_wishlist" type="submit" class="btn btn-light"><i class="fa-regular fa-clock" style="color: #8c00ff;"></i></button>
-                        </form>
+                        <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                            <i class="fa-solid fa-clock" style="color: #8c00ff;"></i>
+                        </button>
+                    {% else %}
+                        <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                            <i class="fa-regular fa-clock" style="color: #8c00ff;"></i>
+                        </button>
                     {% endif %}
                 {% endif %}
             </div>
@@ -247,19 +367,13 @@
                     <div class="like-area">
                         {% if user.is_authenticated %}
                             {% if request.user.profile in comment.comment_likes.all %}
-                                <form  action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
-                                    {% csrf_token %}
                                     <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
                                         <i class="fa-solid fa-thumbs-up"></i>
                                     </button>
-                                </form>
                             {% else %}
-                                <form class="like-form" action="{% url 'like_toggle' comment_id=comment.id %}" method="post">
-                                    {% csrf_token %}
                                     <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
                                         <i class="fa-regular fa-thumbs-up"></i>
                                     </button>
-                                </form>
                             {% endif %}
                         {% else %}
                             <form action="{% url 'logout' %}" method="post">
@@ -269,7 +383,10 @@
                                 </button>
                             </form>
                         {% endif %}
-                        <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p>        
+                        <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p> 
+                        <button id="delete_button{{comment.id}}" class="delete-button" type="button" data-comment="{{comment.id}}">
+                            <i class="fa-regular fa-trash-can" style="color: #000000;"></i>
+                        </button>      
                     </div>
                     <p class="comment-time"><small>{{ comment.comment_time|naturaltime }}</small></p>
                 </div>

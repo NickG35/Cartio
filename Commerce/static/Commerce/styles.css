@@ -500,7 +500,11 @@ then set the desired styles for .card-img. */
 
 div[class^="comment-box"] {
   display: flex;
-  padding: 15px;
+  padding: 20px;
+  margin-bottom: 10px;
+  animation-name: show;
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
 }
 
 .listing-user:hover {
@@ -527,8 +531,52 @@ div[class^="comment-box"] {
   margin-right: 5px;
 }
 
+.delete-button {
+  margin-left: auto;
+}
 
 
+@keyframes show {
+  0% {
+    opacity: 0;
+    height: 0px;
+    padding: 0px;
+  }
+  50% {
+    opacity: 0;
+    height: 100%;
+    padding: 20px;
+  }
+  100%{
+    opacity: 1;
+    height: 100%;
+    padding: 20px;
+  }
+}
+
+@keyframes hide {
+   0% {
+        opacity: 1;
+        height: 100%;
+        line-height: 100%;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    75% {
+        opacity: 0;
+        height: 100%;
+        line-height: 100%;
+        padding: 20px;
+        margin-bottom: 10px;
+    }
+    100% {
+        opacity: 0;
+        height: 0px;
+        line-height: 0px;
+        padding: 0px;
+        margin-bottom: 0px;
+    }
+}
 
 @keyframes greentopBubbles {
   0% {

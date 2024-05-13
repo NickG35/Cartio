@@ -84,7 +84,7 @@ def listing_detail(request, listing_id):
      starting_price = listing_object.listing_price
      bid_price = listing_object.listing_bid_price
      current_bidder = Bid.objects.filter(bidding_listing=listing_object).last()
-     comments = Comments.objects.filter(comment_listing=listing_object).order_by('comment_time').all()
+     comments = Comments.objects.filter(comment_listing=listing_object).order_by('-comment_time').all()
      if request.method == 'POST':
           # organizing post requests by form and passing variables to bid and comment views
           if 'bid' in request.POST:
@@ -98,12 +98,6 @@ def listing_detail(request, listing_id):
                     listing_object.listing_bid_winner = listing_object.listing_user
                listing_object.save()
                return HttpResponseRedirect(reverse("index"))
-          # add listing to wishlist
-          elif 'add_wishlist' in request.POST:
-               listing_object.listing_wishlist.add(request.user.profile.id)
-          # remove listing from wishlist
-          elif 'remove_wishlist' in request.POST:
-               listing_object.listing_wishlist.remove(request.user.profile.id)
           return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
      else:
           # presents bid and comment forms
@@ -159,7 +153,7 @@ def comment(request, listing_id):
                comment_comment = (data["comment_text"]),
                comment_time = datetime.now()
           )
-          return JsonResponse({"data": {"comment_pic":new_comment.comment_user.profile_pic.url, "comment_user": new_comment.comment_user.user.username, "comment_comment": new_comment.comment_comment, "comment_time": naturaltime(new_comment.comment_time), "likes":new_comment.comment_likes.count(), "comment_id":new_comment.id}})
+          return JsonResponse({"data": {"comment_pic":new_comment.comment_user.profile_pic.url, "comment_user": new_comment.comment_user.user.username, "comment_comment": new_comment.comment_comment, "comment_time": naturaltime(new_comment.comment_time), "likes":new_comment.comment_likes.count(), "comment_id":new_comment.id, "user_id":request.user.id},})
 
 def follow(request, profile_id):
      if request.method == "POST":
@@ -198,6 +192,32 @@ def unlike_toggle(request, comment_id):
           comments.comment_likes.remove(user)
           comments.save()
           return JsonResponse({"data": {"likes":comments.comment_likes.count()}})
+
+def delete_comment(request, comment_id):
+     if request.method == "POST":
+          comments = Comments.objects.get(id=comment_id)
+          comments.delete()
+          return JsonResponse({"data": {"comment": comments.comment_comment}})
+     
+def add_wish(request, user_id):
+     if request.method == "POST":
+          data = json.loads(request.body)
+          listing_id = (data["listingId"])
+          listing = Listing.objects.get(id=listing_id)
+          user = Profile.objects.get(id=user_id)
+          listing.listing_wishlist.add(user)
+          listing.save()
+          return JsonResponse({"data": {"user":request.user.username}})
+
+def remove_wish(request, user_id):
+     if request.method == "POST":
+          data = json.loads(request.body)
+          listing_id = (data["listingId"])
+          listing = Listing.objects.get(id=listing_id)
+          user = Profile.objects.get(id=user_id)
+          listing.listing_wishlist.remove(user)
+          listing.save()
+          return JsonResponse({"data": {"user":request.user.username}})
 
 
 def wishlist(request):

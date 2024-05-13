@@ -309,7 +309,7 @@ then set the desired styles for .card-img. */
 
 }
 
-.close-form {
+#close-form {
   margin: 25px;
   text-align: center;
   width: 85%;

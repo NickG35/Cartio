@@ -19,5 +19,8 @@ urlpatterns = [
     path("like_toggle/<int:comment_id>", views.like_toggle, name= "like_toggle"),
     path("unlike_toggle/<int:comment_id>", views.unlike_toggle, name= "unlike_toggle"),
     path("delete_comment/<int:comment_id>", views.delete_comment, name="delete_comment"),
-    path("comment/<int:listing_id>", views.comment, name="comment")
+    path("comment/<int:listing_id>", views.comment, name="comment"),
+    path("noti_click/<int:user_id>", views.noti_click, name="noti_click"),
+    path("noti_change/<int:noti_id>", views.noti_change, name="noti_change"),
+    path('notifications', views.noti_page, name="noti_page")
 ]

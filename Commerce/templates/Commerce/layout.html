@@ -1,4 +1,5 @@
 {% load static %}
+{% load humanize %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,6 +21,72 @@
   
 </head>
 <body>
+  <script>
+    function notiClick(id) {
+        const notiBell = document.getElementById(`bell${id}`);
+        let notifications = document.querySelector('.position-absolute');
+
+        fetch(`/noti_click/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{
+            return response.json()
+        }) 
+        .then(data => {
+          if (notifications) {
+            notifications.style.display = 'none';
+          }
+            console.log('Notifications:', data.data.notifs);
+        })
+        .catch(error => console.log(error, 'ERROR'))
+    }
+
+   function notiChange(id) {
+        const notifs = document.getElementById(`noti${id}`);
+
+        fetch(`/noti_change/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response =>{ 
+            return response.json()
+        }) 
+        .then(data => {
+            console.log('Read:', data.data.notifs);
+        })
+        .catch(error => console.log(error, 'ERROR'))
+    }
+
+     document.addEventListener('DOMContentLoaded', function() {
+        let notifications = document.querySelectorAll('.notibell');
+        notifications.forEach(button => {
+            button.addEventListener('click', function(){
+              user_id = button.getAttribute('data-id');
+              notiClick(user_id)
+            })
+        })
+        let dropNoti = document.querySelectorAll('.dropdown-item');
+        dropNoti.forEach(button => {
+            let isRead = button.getAttribute('data-reading');
+            let circleIcon = button.querySelector('.fa-circle');   
+            if (isRead === 'True') {
+              button.style.backgroundColor = '#f2f2f2'; 
+              circleIcon.remove()   
+            }
+          button.addEventListener('click', function(){
+            noti_id = button.getAttribute('data-id');
+            notiChange(noti_id);
+          });
+        });
+     });
+  </script>
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
                   <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src='media/images/navlogo.jpg'></a>
@@ -55,29 +122,41 @@
                     </ul>
                     {% if user.is_authenticated %}
                         <div class="btn-group dropstart">
-                          <button data-bs-toggle="dropdown" aria-expanded="false">                  
+                          <button class="notibell" id="bell{{user.id}}" data-bs-toggle="dropdown" data-id="{{ user.id }}" aria-expanded="false">                  
                             <i class="fa-regular fa-bell fa-xl"></i>
+                            {% if notifs.last.noti_count != 0 %}
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                              {{ notifs|length }} 
+                              {% if notifs.last.noti_count > 9 %}
+                                  9+
+                              {% else %}
+                                  {{ notifs.last.noti_count}}
+                              {% endif %}
                               <span class="visually-hidden">unread messages</span>
                             </span>
+                            {% else %}
+                                  <span></span>
+                            {% endif %}
                           </button>
                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                              {% for notif in notifs|dictsortreversed:"noti_time" %}
+                              <li class="more-noti"><b>Notifications</b></li>
+                              {% for notif in notifs|dictsortreversed:"noti_time"|slice:":7" %}
                                 {% if notif.noti_follower %}
-                                  <li><a class="dropdown-item" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}">{{ notif.noti_follower }} started following you</a></li>
+                                  <li><a id="noti{{noti.id}}" class="dropdown-item"  data-reading="false" data-id="{{notif.noti_read}}" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_follower.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">{{ notif.noti_follower }} started following you</span></a><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></li>
                                 {% elif notif.noti_bid %}
                                   {% if notif.noti_bid == request.user.profile %}
-                                    <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">You just bid on your listing <i>{{notif.noti_listing }}</i></a></li>
+                                    <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">You just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
                                   {% else %}
-                                    <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">{{ notif.noti_bid }} has just bid on your listing <i>{{notif.noti_listing }}</i></a></li>   
+                                    <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">{{ notif.noti_bid }} has just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></a></li>                                   
                                   {% endif %}
                                 {% elif notif.noti_winner %}
-                                  <li><a class="dropdown-item" href="{% url 'listing' listing_id=notif.noti_listing.id %}">Congratulations, {{ notif.noti_winner }}! You just won the auction <i>{{notif.noti_listing }}.</i></a></li>                         
+                                  <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_winner.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">Congratulations, {{ notif.noti_winner }}! You just won the auction<i class="noti_listing">{{notif.noti_listing }}.</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>                         
                                 {% endif %}
                               {% empty %}
-                                <li><a class="dropdown-item" href="">No notifications to display</a></li>
+                                <li><a id="noti{{notif.id}}" class="dropdown-item" href="">No notifications to display</a></li>
                               {% endfor %}
+                              {% if notifs|length > 7 %}
+                                <li class="more-noti"><a href="{% url 'noti_page' %}">See more</a></li>
+                              {% endif %}
                             </ul>
                         </div>
                       {% endif %}

@@ -87,6 +87,8 @@ class Notifications(models.Model):
     noti_listing = models.ForeignKey(Listing, on_delete = models.CASCADE, related_name='notification_listing', blank=True, null=True)
     noti_winner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='notification_winner', blank=True, null=True)
     noti_time = models.DateTimeField(blank=True, null=True)
+    noti_count = models.IntegerField(blank = True, null = True, default = 0)
+    noti_read = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
         return f"{self.noti_user}"

@@ -28,6 +28,28 @@ def notifications(request):
           'notifs': active_notif
      })
 
+def noti_click(request, user_id):
+     if request.method == "POST":
+          notif_user = Notifications.objects.filter(noti_user=request.user.profile).all()
+          for notification in notif_user:
+               notification.noti_count = 0
+               notification.save()
+          return JsonResponse({"data": {"notifs":notification.noti_count}})
+
+def noti_change(request, noti_id):
+     if request.method == "POST":
+          notifs = Notifications.objects.filter(id=noti_id)
+          for notif in notifs:
+               notif.noti_read = True
+               notif.save()
+          return JsonResponse({"data": {"notifs":notif.noti_read}})
+
+def noti_page(request):
+     active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
+     return render(request, 'Commerce/notifications.html', {
+          'notifs': active_notif
+     })
+
 def profile(request, profile_id):
      profile_user = Profile.objects.get(user_id=profile_id)
      profile_listings = Listing.objects.filter(listing_user=profile_user).all()
@@ -93,7 +115,8 @@ def listing_detail(request, listing_id):
                listing_object.listing_closed = True
                if current_bidder is not None:
                     listing_object.listing_bid_winner = current_bidder.bidding_user
-                    Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object, noti_time=datetime.now() )
+                    existing_count = Notifications.objects.filter(noti_user = current_bidder.bidding_user).values_list('noti_count', flat=True).last()
+                    Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object,  noti_count = existing_count + 1, noti_time=datetime.now())
                else:
                     listing_object.listing_bid_winner = listing_object.listing_user
                listing_object.save()
@@ -139,7 +162,8 @@ def process_bid(request, listing_object, starting_price, bid_price):
           listing_object.save()
           # update user bid information when form is submitted
           new_bid.save()
-          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_time=datetime.now())
+          existing_count = Notifications.objects.filter(noti_user=listing_object.listing_user).values_list('noti_count', flat=True).last()
+          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = existing_count + 1, noti_time=datetime.now())
           
 def comment(request, listing_id):
      # comment form allows users to post their comments on a listing

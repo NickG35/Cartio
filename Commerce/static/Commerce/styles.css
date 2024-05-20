@@ -535,7 +535,55 @@ div[class^="comment-box"] {
   margin-left: auto;
 }
 
+.dropdown-item{
+  display: flex;
+  align-items: center;
+  border: 1px solid lightgray;
+  position: relative;
+}
 
+.noti-time {
+  margin-left: auto;
+  padding-left: 10px;
+}
+
+.fa-circle {
+  position: absolute;
+  top: 35%;
+  right: 2px;
+}
+.noti_listing {
+  padding: 5px;
+}
+
+.more-noti {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  text-align: center;
+  padding: 10px;
+}
+
+
+
+.notis-ul {
+  text-align: center;
+}
+
+.noti-writing {
+  padding-left: 20px;
+  padding-right: 50px;
+}
+
+.page-notis {
+  padding: 5px;
+  border: 1px solid lightgray;
+}
+
+.noti-page-list {
+  max-width: 600px; /* Adjust the max-width as needed */
+  margin: 0 auto; /* Center the list horizontally */
+}
 @keyframes show {
   0% {
     opacity: 0;

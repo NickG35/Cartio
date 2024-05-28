@@ -32,8 +32,11 @@ def noti_click(request, user_id):
      if request.method == "POST":
           notif_user = Notifications.objects.filter(noti_user=request.user.profile).all()
           for notification in notif_user:
-               notification.noti_count = 0
-               notification.save()
+               if notification.noti_count:
+                    notification.noti_count = 0
+                    notification.save()
+               else:
+                    pass
           return JsonResponse({"data": {"notifs":notification.noti_count}})
 
 def noti_change(request, noti_id):
@@ -46,8 +49,10 @@ def noti_change(request, noti_id):
 
 def noti_page(request):
      active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
+     button_disabled = True
      return render(request, 'Commerce/notifications.html', {
-          'notifs': active_notif
+          'notifs': active_notif,
+          'button_disabled': button_disabled
      })
 
 def profile(request, profile_id):
@@ -116,7 +121,10 @@ def listing_detail(request, listing_id):
                if current_bidder is not None:
                     listing_object.listing_bid_winner = current_bidder.bidding_user
                     existing_count = Notifications.objects.filter(noti_user = current_bidder.bidding_user).values_list('noti_count', flat=True).last()
-                    Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object,  noti_count = existing_count + 1, noti_time=datetime.now())
+                    if existing_count is None:
+                          Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object,  noti_count = 1, noti_time=datetime.now())
+                    else:
+                         Notifications.objects.create(noti_user = current_bidder.bidding_user, noti_winner = current_bidder.bidding_user, noti_listing=listing_object,  noti_count = existing_count + 1, noti_time=datetime.now())
                else:
                     listing_object.listing_bid_winner = listing_object.listing_user
                listing_object.save()
@@ -162,8 +170,12 @@ def process_bid(request, listing_object, starting_price, bid_price):
           listing_object.save()
           # update user bid information when form is submitted
           new_bid.save()
+
           existing_count = Notifications.objects.filter(noti_user=listing_object.listing_user).values_list('noti_count', flat=True).last()
-          Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = existing_count + 1, noti_time=datetime.now())
+          if existing_count is None:
+               Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = 1, noti_time=datetime.now())
+          else:
+               Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = existing_count + 1, noti_time=datetime.now())
           
 def comment(request, listing_id):
      # comment form allows users to post their comments on a listing
@@ -187,7 +199,31 @@ def follow(request, profile_id):
           profile_user.followed_by.add(follower_id)
           follower_profile = Profile.objects.get(user_id=follow_id)
           profile_user.save()
-          return JsonResponse({"data": {"followers": profile_user.followed_by.count(), "following": profile_user.follow.count(), "follower_id":follower_profile.user_id, "follower_pfp": follower_profile.profile_pic.url, "follow_user": follower_profile.user.username}})
+          existing_count = Notifications.objects.filter(noti_user=profile_user).values_list('noti_count', flat=True).last()
+          if existing_count is None:
+               Notifications.objects.create(noti_user=profile_user, noti_follower=request.user.profile, noti_count = 1, noti_time=datetime.now())
+          else:
+               Notifications.objects.create(noti_user=profile_user, noti_follower=request.user.profile,noti_count = existing_count + 1, noti_time=datetime.now())
+          if follower_profile.profile_pic and follower_profile.profile_pic.url:
+               return JsonResponse({
+                    "data": {
+                         "followers": profile_user.followed_by.count(),
+                         "following": profile_user.follow.count(),
+                         "follower_id": follower_profile.user_id,
+                         "follower_pfp": follower_profile.profile_pic.url,
+                         "follow_user": follower_profile.user.username
+                    }
+               })
+          else:
+               return JsonResponse({
+                    "data": {
+                         "followers": profile_user.followed_by.count(),
+                         "following": profile_user.follow.count(),
+                         "follower_id": follower_profile.user_id,
+                         "follower_pfp": "../media/images/default_profile.png",
+                         "follow_user": follower_profile.user.username
+                    }
+               })
 
 def unfollow(request, profile_id):
      if request.method == "POST":
@@ -197,7 +233,28 @@ def unfollow(request, profile_id):
           profile_user.followed_by.remove(follower_id)
           follower_profile = Profile.objects.get(user_id=follow_id)
           profile_user.save()
-          return JsonResponse({"data": {"followers": profile_user.followed_by.count(), "following":profile_user.follow.count(), "follower_id":follower_profile.user_id, "follower_pfp": follower_profile.profile_pic.url, "follow_user": follower_profile.user.username}})
+          follower_filter = Notifications.objects.filter(noti_user=profile_user, noti_follower=request.user.profile)
+          follower_filter.delete()
+          if follower_profile.profile_pic and follower_profile.profile_pic.url:
+               return JsonResponse({
+                    "data": {
+                         "followers": profile_user.followed_by.count(),
+                         "following": profile_user.follow.count(),
+                         "follower_id": follower_profile.user_id,
+                         "follower_pfp": follower_profile.profile_pic.url,
+                         "follow_user": follower_profile.user.username
+                    }
+               })
+          else:
+               return JsonResponse({
+                    "data": {
+                         "followers": profile_user.followed_by.count(),
+                         "following": profile_user.follow.count(),
+                         "follower_id": follower_profile.user_id,
+                         "follower_pfp": "../media/images/default_profile.png",
+                         "follow_user": follower_profile.user.username
+                    }
+               })
 
 @csrf_protect
 def like_toggle(request, comment_id):
@@ -282,24 +339,41 @@ def register(request):
           email = request.POST["email"]
           password = request.POST["password"]
           confirmation = request.POST["confirmation"]
+          loggin = True
+          errors = {}
+          if not email:
+               errors['email'] = "Please enter an email"
+               return render(request, "Commerce/register.html", {
+                    'errors': errors
+               })
           # if password doesn't match, raise an error message
           if password != confirmation:
                return render(request, "Commerce/register.html", {
-                    "message": "Passwords do not match"
+                    errors['password']: "Passwords do not match"
                })
           # if user already exists, raise error message
+          if not user:
+               return render(request,)
           try:
                user = User.objects.create_user(username, email, password)
                user.save()
           except IntegrityError:
                return render(request, "Commerce/register.html", {
-                    "messagey": "Username already taken."
+                    errors['username']: "Username already taken",
+                    'loggin': loggin
+               })
+          if errors:
+               return render(request, "Commerce/register.html", {
+                    "errors": errors
                })
           # if not log the user in immediately
           login(request, user)
           return HttpResponseRedirect(reverse("index"))
      else:
-          return render(request,"Commerce/register.html")
+          loggin = True
+          return render(request,"Commerce/register.html", {
+               'loggin': loggin
+          })
 
 def login_view(request):
     # allow user to log in with their username and password
@@ -313,11 +387,16 @@ def login_view(request):
             return HttpResponseRedirect(reverse("index"))
         # if not provide error message
         else:
+            loggin = True
             return render(request, "Commerce/login.html", {
-                "message": "Invalid username and/or password."
+                "message": "Invalid username and/or password.",
+                'loggin': loggin
             })
     else:
-        return render(request, "Commerce/login.html")
+        loggin = True
+        return render(request, "Commerce/login.html", {
+             'loggin': loggin
+        })
 
 def logout_view(request):
      # log user out of site

@@ -9,6 +9,12 @@
   text-align: center;
 }
 
+.error {
+  color: red;
+  text-align: center;
+  font-size: 12px;
+}
+
 .form {
   background-color: #fff;
   display: block;
@@ -543,7 +549,8 @@ div[class^="comment-box"] {
 }
 
 .noti-time {
-  margin-left: auto;
+  display: flex;
+  position: relative;
   padding-left: 10px;
 }
 

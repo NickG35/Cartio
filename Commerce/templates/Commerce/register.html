@@ -6,15 +6,24 @@
         <form action="{% url 'register' %}" method="post" class="form">
           {% csrf_token %}
           <p class="form-title">Register an account</p>
+            {% if errors.email %}
+             <p class="error">{{ errors.email }}</p>
+            {% endif %}
             <div class="input-container">
             <input type="email" placeholder="Enter email" name="email">
             </div>
+            {% if errors.username %}
+            <p class="error">{{ errors.username }}</p>
+          {% endif %}
             <div class="input-container">
               <input type="text" placeholder="Enter username" name="username">
             </div>
             <div class="input-container">
             <input type="password" placeholder="Enter password" name="password">
             </div>
+              {% if errors.password %}
+                <p class="error">{{ errors.password }}</p>
+              {% endif %}
             <div class="input-container">
               <input type="password" placeholder="Confirm password" name="confirmation">
             </div>

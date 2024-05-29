@@ -317,6 +317,12 @@ function deleteComment(id){
                 <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
             {% endif %}
             {% if listing.listing_closed == False %}
+                {% if errors.firstBid %}
+                    <p class="error">{{ errors.firstBid }}</p>
+                {% endif %}
+                {% if errors.otherBid %}
+                    <p class="error">{{ errors.otherBid }}</p>
+                {% endif %}
             <form class="form-container" name="bid" action="" method="post">
                     {% csrf_token %}
                     {{ form }}

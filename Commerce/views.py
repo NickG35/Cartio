@@ -115,7 +115,20 @@ def listing_detail(request, listing_id):
      if request.method == 'POST':
           # organizing post requests by form and passing variables to bid and comment views
           if 'bid' in request.POST:
-               process_bid(request, listing_object, starting_price, bid_price)
+               errors = process_bid(request, listing_object, starting_price, bid_price)
+               if errors:
+                    form = BidForm
+                    formy = CommentForm   
+                    return render(request, 'Commerce/listing.html', {
+                         'listing_object': listing_object,
+                         'listings': listing_details,
+                         'formy' : formy,
+                         'form': form,
+                         'comments': comments,
+                         'starting_price': starting_price,
+                         'bid_count': listing_object.bidding_count,
+                         'errors': errors
+          })
           elif 'close' in request.POST:
                listing_object.listing_closed = True
                if current_bidder is not None:
@@ -146,6 +159,7 @@ def listing_detail(request, listing_id):
 
 def process_bid(request, listing_object, starting_price, bid_price):      
      form = BidForm(request.POST)
+     errors = {}
      # bid form to allow users to post bids
      if form.is_valid():
           new_bid = form.save(commit=False)
@@ -158,24 +172,27 @@ def process_bid(request, listing_object, starting_price, bid_price):
                     listing_object.listing_bid_price = current_bid
                     listing_object.bidding_count += 1
                else:
-                    raise ValueError('bid is invalid')
+                    errors['firstBid'] = 'First bid must be equal or greater than listed price'
           # if there are bids posted, subsequent bids must be greater
           else:
                if current_bid > listing_object.listing_bid_price:
                     listing_object.listing_bid_price = current_bid
                     listing_object.bidding_count += 1
                else:
-                    raise ValueError('bid is invalid')
+                    errors['otherBid'] = 'Bids following the first bid must be greater than the previous bid'
           # save the listing object once form is submitted to update listing price
           listing_object.save()
           # update user bid information when form is submitted
-          new_bid.save()
+          if not errors:
+               new_bid.save()
 
-          existing_count = Notifications.objects.filter(noti_user=listing_object.listing_user).values_list('noti_count', flat=True).last()
-          if existing_count is None:
-               Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = 1, noti_time=datetime.now())
-          else:
-               Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = existing_count + 1, noti_time=datetime.now())
+               existing_count = Notifications.objects.filter(noti_user=listing_object.listing_user).values_list('noti_count', flat=True).last()
+               if existing_count is None:
+                    Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = 1, noti_time=datetime.now())
+               else:
+                    Notifications.objects.create(noti_user=listing_object.listing_user, noti_bid=request.user.profile, noti_listing=listing_object, noti_count = existing_count + 1, noti_time=datetime.now())
+               
+          return errors
           
 def comment(request, listing_id):
      # comment form allows users to post their comments on a listing
@@ -341,34 +358,37 @@ def register(request):
           confirmation = request.POST["confirmation"]
           loggin = True
           errors = {}
+
           if not email:
                errors['email'] = "Please enter an email"
-               return render(request, "Commerce/register.html", {
-                    'errors': errors
-               })
+
+           # if username not entered, raise an error
+          if not username:
+               errors['username'] = "Please enter a username"
+          else:
+               try:
+                    user = User.objects.create_user(username, email, password)
+                    user.save()
+               except IntegrityError:
+                    errors['username'] = "Username already taken"
+          
+          #if password is not entered, raise an error
+          if not password:
+               errors['password'] = "Please enter a password"
+
           # if password doesn't match, raise an error message
           if password != confirmation:
+               errors['confirmation'] = "Passwords do not match"
+
+          if not errors:
+                # if not log the user in immediately
+               login(request, user)
+               return HttpResponseRedirect(reverse("index"))   
+          else:
                return render(request, "Commerce/register.html", {
-                    errors['password']: "Passwords do not match"
-               })
-          # if user already exists, raise error message
-          if not user:
-               return render(request,)
-          try:
-               user = User.objects.create_user(username, email, password)
-               user.save()
-          except IntegrityError:
-               return render(request, "Commerce/register.html", {
-                    errors['username']: "Username already taken",
+                    "errors": errors,
                     'loggin': loggin
                })
-          if errors:
-               return render(request, "Commerce/register.html", {
-                    "errors": errors
-               })
-          # if not log the user in immediately
-          login(request, user)
-          return HttpResponseRedirect(reverse("index"))
      else:
           loggin = True
           return render(request,"Commerce/register.html", {

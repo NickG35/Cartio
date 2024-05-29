@@ -18,11 +18,14 @@
             <div class="input-container">
               <input type="text" placeholder="Enter username" name="username">
             </div>
+            {% if errors.password %}
+              <p class="error">{{ errors.password }}</p>
+            {% endif %}
             <div class="input-container">
             <input type="password" placeholder="Enter password" name="password">
             </div>
-              {% if errors.password %}
-                <p class="error">{{ errors.password }}</p>
+              {% if errors.confirmation %}
+                <p class="error">{{ errors.confirmation }}</p>
               {% endif %}
             <div class="input-container">
               <input type="password" placeholder="Confirm password" name="confirmation">

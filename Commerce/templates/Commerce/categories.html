@@ -1,14 +1,7 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <h1 class="header">Categories</h1>
-    <div class="centered">
-        <form action="" method="post">
-            {% csrf_token%}
-            {{ form }}
-            <button type="submit" class="category-button">Search</button>
-        </form>
-    </div>  
+    <h1 class="header">{{ category_name }}</h1>
         <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
             {% for category in categories %}
                 <div class="col">

@@ -17,7 +17,7 @@ from django.contrib.humanize.templatetags.humanize import naturaltime
 
 def index(request):
     # display all listings that were created by all users
-    active_listings = Listing.objects.filter(listing_closed=False).all()
+    active_listings = Listing.objects.filter(listing_closed=False).order_by('-listing_date').all()
     return render(request, 'Commerce/index.html', {
           'active_listings': active_listings,
     })
@@ -325,23 +325,13 @@ def wishlist(request):
           'wishes': wishes
      })
 
-def category(request):
-     if request.method == 'POST':
-          # display category form on page
-          form = CategoryForm
-          # the category selected and submitted will display all listings that are under that specific category
-          category = request.POST['listing_category']
-          categories = Listing.objects.filter(listing_category=category, listing_closed=False ).all()
-          return render(request, 'Commerce/categories.html', {
-               'form': form,
-               'categories':categories
-          })
-
-     else: 
-          form = CategoryForm
-          return render(request, 'Commerce/categories.html', {
-               'form': form,
-          })
+def category(request, category_name):
+     # the category selected and submitted will display all listings that are under that specific category
+     categories = Listing.objects.filter(listing_category=category_name, listing_closed=False ).all()
+     return render(request, 'Commerce/categories.html', {
+          'categories':categories,
+          'category_name': category_name
+     })
 
 def closed_listing(request):
      closed_listings = Listing.objects.filter(listing_closed=True).all()

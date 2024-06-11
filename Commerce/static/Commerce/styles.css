@@ -1,7 +1,9 @@
-
+body {
+  background-color: #f2f0ea;
+}
 .nav-logo {
-    width: 45px; 
-    height: 45px;
+    width: 170px; 
+    height: 50px;
 }
 
 .centered {
@@ -105,6 +107,76 @@
   text-decoration: underline;
 }
 
+.img-container {
+  position: relative;
+  display: inline-block;
+  max-width: 250px;
+  height: 350px;
+  justify-content: center;
+  padding: 20px;
+}
+
+.img-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%; /* Cover the entire container */
+  height: 100%;
+  background-color: #a4a4a4; /* Replace with your desired background color */
+  z-index: -1; /* Place the background behind the image */
+  opacity: .2; /* Adjust opacity as needed */
+  border-radius: 5%;
+}
+.prodimg {
+  display: block;
+  max-width: 100%;
+}
+
+.cardText {
+  font-family: arial;
+  font-weight:bold;
+}
+
+.col {
+  width: 270px;
+}
+
+.d-block {
+  width: 94%;
+  height: 500px;
+}
+
+#carouselExampleIndicators {
+  width: 59%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 10px;
+}
+.row {
+  width: 60%;
+  display: flex;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#bottom-nav {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.nav-pfp {
+  padding-right: 25px;
+}
+
+.nav-item {
+  margin-left: 8px;
+  margin-right: 8px;
+}
+.listingAuthor {
+  color: gray;
+  font-family: arial;
+  font-weight: bold;
+}
 /* before adding the img to the div with the 
 "card-img" class, remove css styles 
 .card-img .img::before and .card-img .img::after,
@@ -548,10 +620,19 @@ div[class^="comment-box"] {
   position: relative;
 }
 
+.dropdown-menu {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .noti-time {
   display: flex;
   position: relative;
   padding-left: 10px;
+}
+
+.notibell {
+  color: black;;
 }
 
 .fa-circle {

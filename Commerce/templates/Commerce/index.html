@@ -1,26 +1,84 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <h1 class="header">Active Listings</h1>
-        <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
-        {% for listing in active_listings %}
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
-                        <div class="card-title">{{ listing.listing_name }}</div>
-                        <div class="card-subtitle">{{ listing.listing_description }}</div>
-                        <hr class="card-divider">
-                        <div class="card-footer">
-                            <div class="card-price">
-                                {% if listing.listing_bid_price is none %}
-                                    <h5 class="card-title">$ {{ listing.listing_price }}</h5>
-                                {% else %}
-                                    <h5 class="card-title">$ {{ listing.listing_bid_price }}</h5>
-                                {% endif %}
-                            </div>
-                            <a href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
-                        </div>
-                    </div>
+<script>
+     var myCarousel = $('#carouselExampleIndicators');
+     function nextSlide(){
+        myCarousel.carousel('next');
+     }
+     setTimeout(nextSlide, 1000);
+
+
+</script>
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+          <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+          <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="d-block" src="../media/images/clothing.jpg" alt="First slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
                 </div>
-        {% endfor %}
+            </div>
+            <div class="carousel-item">
+                <img class="d-block" src="../media/images/technology.jpg" alt="Second slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block" src="../media/images/petFood.jpg" alt="Third slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block" src="../media/images/auto.jpg" alt="Fourth slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>...</h5>
+                    <p>...</p>
+                </div>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </div>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+    {% for listing in active_listings %}
+        <div class="col">
+            <a href="{% url 'listing' listing_id=listing.id %}">
+                <div class="img-container">
+                    <div class="img-background"></div>
+                    <div class="prodimg"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div>
+                </div>
+                <div class="lower-card">
+                    <div class="titleCard">
+                        <p class="cardText">{{ listing.listing_name }}</p>
+                    </div>
+                    <small class="listingAuthor">Listed by {{ listing.listing_user }}</small>
+                        <div class="priceCard">
+                            {% if listing.listing_bid_price is none %}
+                                <p class="cardText">$ {{ listing.listing_price }}</p>
+                            {% else %}
+                                <p class="cardText">$ {{ listing.listing_bid_price }}</p>
+                            {% endif %}
+                        </div>
+                </div>
+            </a>                          
+        </div>
+    {% endfor %}
+    </div>
 {% endblock %}

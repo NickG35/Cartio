@@ -15,6 +15,9 @@
       <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
       <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
       <script src="https://kit.fontawesome.com/8b6abeeef6.js" crossorigin="anonymous"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
       <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
       <link href="{% static 'Commerce/styles.css' %}" rel="stylesheet">
   </head>
@@ -87,40 +90,33 @@
         });
      });
   </script>
+      {% if not loggin %}
             <nav class="navbar navbar-expand-lg bg-body-tertiary">
                 <div class="container-fluid">
-                  <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src='media/images/navlogo.jpg'></a>
                   <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                   </button>
                   <div class="collapse navbar-collapse" id="navbarText">
-                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                      {% if user.is_authenticated %}
-                      <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{% url 'profile' profile_id=user.id %}">{{ request.user.profile }}</a>
-                      </li>
-                      {% endif %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'index' %}">Home</a>
-                      </li>
-                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'category' %}">Categories</a>
-                      </li>
-                      {% if user.is_authenticated %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'wishlist' %}">Wishlist</a>
-                      </li>
-                      {% endif %}
-                      {% if user.is_authenticated %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'create_listing' %}">Create a listing</a>
-                      </li>
-                      {% endif %}
-                      <li class="nav-item">
-                        <a class="nav-link" href="{% url 'closed_listing' %}">Closed listings</a>
-                      </li>
+                    <ul id="bottom-nav" class="navbar-nav me-auto mb-2 mb-lg-0">
+                      <a class="navbar-brand" href="{% url 'index' %}"><img class="nav-logo" src="{% get_media_prefix %}images/Cartio (3).png"></a>
                     </ul>
                     {% if user.is_authenticated %}
+                          {% if user.is_authenticated %}
+                            <div class="nav-pfp">
+                              <div class="dropdown">
+                                {% if request.user.profile.profile_pic %}
+                                  <a data-bs-toggle="dropdown" data-id="{{ user.id }}" aria-expanded="false" href="{% url 'profile' profile_id=user.id %}"><img class="comment-pic" src='{{ request.user.profile.profile_pic.url }}'></a>
+                                {% else %}
+                                  <a data-bs-toggle="dropdown" data-id="{{ user.id }}" aria-expanded="false" href="{% url 'profile' profile_id=user.id %}"><img class="comment-pic" src="{% get_media_prefix %}images/default_profile.png"></a>
+                                {% endif %}
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                  <a class="dropdown-item" href="{% url 'profile' profile_id=request.user.id %}">View profile</a>
+                                  <a class="dropdown-item" href="{% url 'wishlist' %}">Wishlist</a>
+                                  <a class="dropdown-item" href="{% url 'create_listing' %}">Create a listing</a>
+                                </div>
+                              </div>
+                            </div>
+                        {% endif %}
                         <div class="btn-group dropstart">
                           {% if button_disabled %}
                             <button class="notibell" id="bell{{user.id}}" data-bs-toggle="dropdown" data-id="{{ user.id }}" aria-expanded="false" disabled> 
@@ -129,14 +125,14 @@
                           {% endif %}                 
                             <i class="fa-regular fa-bell fa-xl"></i>
                             {% if notifs.last.noti_count != 0 %}
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                              {% if notifs.last.noti_count > 9 %}
-                                  9+
-                              {% else %}
-                                  {{ notifs.last.noti_count}}
-                              {% endif %}
-                              <span class="visually-hidden">unread messages</span>
-                            </span>
+                              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {% if notifs.last.noti_count > 9 %}
+                                    9+
+                                {% else %}
+                                    {{ notifs.last.noti_count}}
+                                {% endif %}
+                                <span class="visually-hidden">unread messages</span>
+                              </span>
                             {% else %}
                                   <span style="display: none;"></span>
                             {% endif %}
@@ -182,7 +178,7 @@
                       {% endif %}
                     {% if user.is_authenticated %}
                     <span class="navbar-text">
-                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        <a class="nav-link" href="{% url 'logout' %}"><i class="fa-solid fa-right-from-bracket fa-lg" style="color: #000000;"></i></a>
                     </span>
                     {% else %}
                     {% if not loggin %}
@@ -195,6 +191,61 @@
                   </div>
                 </div>
             </nav>
+            <nav class="navbar navbar-expand-lg bg-dark navbar-dark">
+              <div class="container-fluid">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                  <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarText">
+                  <ul id="bottom-nav" class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='technology' %}">Technology</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='art' %}">Art</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='tools' %}">Tools</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='home' %}">Home</a>
+                    </li>
+              
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='auto' %}">Auto</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='memorabilia' %}">Memorabilia</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='sports' %}">Sports</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='fitness' %}">Fitness</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='clothing' %}">Clothing</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='health' %}">Health</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='beauty' %}">Beauty</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='travel' %}">Travel</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'category' category_name='pet' %}">Pet</a>
+                    </li>
+                    <li class="nav-item">
+                      <a class="nav-link" href="{% url 'closed_listing' %}">Closed listings</a>
+                    </li>
+                  </ul>               
+                </div>
+              </div>
+          </nav>
+        {% endif %}
 
         <div class="body">
             {% block body %}

@@ -2,16 +2,29 @@
 
 {% block body %}
     <h1 class="header">{{ category_name }}</h1>
-        <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
-            {% for category in categories %}
-                <div class="col">
-                    <div class="card h-100">
-                        <div class="card-img"><div class="img"><img src="{{ category.listing_image.url }}" alt="{{category.listing_name}}"></div></div>
-                        <div class="card-title">{{ category.listing_name }}</div>
-                        <div id="closed-footer" class="card-footer">
-                            <a class="closed-link" href="{% url 'listing' listing_id=category.id %}"><button class="card-btn">View</button></a>
+    <div class="row row-cols-1 row-cols-md-4 g-4">
+        {% for category in categories %}
+            <div class="col">
+                <a href="{% url 'listing' listing_id=category.id %}">
+                    <div class="img-container">
+                        <div class="img-background"></div>
+                        <div class="prodimg"><img src="{{ category.listing_image.url }}" alt="{{category.listing_name}}"></div>
+                    </div>
+                    <div class="lower-card">
+                        <div class="titleCard">
+                            <p class="cardText">{{ category.listing_name }}</p>
+                        </div>
+                        <small class="listingAuthor">Listed by {{ category.listing_user }}</small>
+                        <div class="priceCard">
+                            {% if category.listing_bid_price is none %}
+                                <p class="cardText">$ {{ category.listing_price }}</p>
+                            {% else %}
+                                <p class="cardText">$ {{ category.listing_bid_price }}</p>
+                            {% endif %}
                         </div>
                     </div>
-                </div>
+                </a>                          
+            </div>
         {% endfor %}
+    </div>
 {% endblock %}

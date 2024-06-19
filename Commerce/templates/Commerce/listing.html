@@ -267,11 +267,11 @@ function deleteComment(id){
                 if (currentState === 'wish') {
                     addWishlist(profileId);
                     button.setAttribute('data-wishlist', 'wished');
-                    button.innerHTML = '<i class="fa-solid fa-clock" style="color: #8c00ff;"></i>';
+                    button.innerHTML = '<i class="fa-solid fa-heart" style="color: black;"></i>';
                 } else if (currentState === 'wished') {
                     removeWishlist(profileId);
                     button.setAttribute('data-wishlist', 'wish');
-                    button.innerHTML = '<i class="fa-regular fa-clock" style="color: #8c00ff;"></i>';
+                    button.innerHTML = '<i class="fa-regular fa-heart" style="color: black;"></i>';
                 }
             });
         });
@@ -295,54 +295,61 @@ function deleteComment(id){
 
 </script>
 {% for listing in listings %}
-    <div id="image-container" class="container">
-        <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
-        <div class="inner-container">
-            <div id="header-container" class="container">
-                <h1 class="header">{{ listing.listing_name }}</h1>
-                {% if user.is_authenticated %}
-                    {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
-                        <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
-                            <i class="fa-solid fa-clock" style="color: #8c00ff;"></i>
-                        </button>
-                    {% else %}
-                        <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
-                            <i class="fa-regular fa-clock" style="color: #8c00ff;"></i>
-                        </button>
-                    {% endif %}
-                {% endif %}
+    <div id="image-container">
+            <div class = "image-box">
+                <div class="imgBack"></div>
+                <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
             </div>
-            {% if user.is_authenticated %}
-            {% if listing.listing_bid_winner == request.user.profile and listing.listing_closed == True %}
-                <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
-            {% endif %}
-            {% if listing.listing_closed == False %}
-                {% if errors.firstBid %}
-                    <p class="error">{{ errors.firstBid }}</p>
-                {% endif %}
-                {% if errors.otherBid %}
-                    <p class="error">{{ errors.otherBid }}</p>
-                {% endif %}
-            <form class="form-container" name="bid" action="" method="post">
-                    {% csrf_token %}
-                    {{ form }}
-                    <div class="input-group-append">
-                        <button name="bid" class="input-add-on" type="submit">Bid</button>
+            <div class="inner-container">
+                <div id="header-container">
+                    <div class="headerbox">
+                        <h1 class="header">{{ listing.listing_name }}</h1>
                     </div>
-            </form>
-            {% endif %}
-            {% endif %}
-            {% if listing.bidding_count == 0 %}
-                <p>$ {{ listing.listing_price }}</p>
-            {% else %}
-                <p>$ {{ listing.listing_bid_price }}</p>
-            {% endif %}
-            <p>{{ listing.bidding_count }} bid(s) on this item.</p>
-            <p>{{ listing.listing_description }}</p>
-            <p>Category: {{ listing.listing_category }}</p>
-            <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> {{ listing.listing_date|naturaltime }}</small>
-        </div>
+                    <div class="watch-button">
+                        {% if user.is_authenticated %}
+                            {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
+                                <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                                    <i class="fa-solid fa-heart" style="color: black;"></i>
+                                </button>
+                            {% else %}
+                                <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                                    <i class="fa-regular fa-heart" style="color: black;"></i>
+                                </button>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% if listing.bidding_count == 0 %}
+                    <p id="price" class="header">$ {{ listing.listing_price }}.00</p>
+                {% else %}
+                    <p id="price" class="header">$ {{ listing.listing_bid_price }}.00</p>
+                {% endif %}
+                <p>{{ listing.bidding_count }} bid(s) on this item.</p>
+                <p>{{ listing.listing_description }}</p>
+                <p>Category: {{ listing.listing_category }}</p>
+                <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> {{ listing.listing_date|naturaltime }}</small>
+            </div>
     </div>
+    {% if user.is_authenticated %}
+        {% if listing.listing_bid_winner == request.user.profile and listing.listing_closed == True %}
+            <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
+        {% endif %}
+        {% if listing.listing_closed == False %}
+            {% if errors.firstBid %}
+                <p class="error">{{ errors.firstBid }}</p>
+            {% endif %}
+            {% if errors.otherBid %}
+                <p class="error">{{ errors.otherBid }}</p>
+            {% endif %}
+        <form class="form-container" name="bid" action="" method="post">
+                {% csrf_token %}
+                <span>$</span>{{ form }}<span>.00</span>
+                <div class="input-group-append">
+                    <button name="bid" class="input-add-on" type="submit">Bid</button>
+                </div>
+        </form>
+        {% endif %}
+    {% endif %}
     {% if user.is_authenticated %}
     {% if listing.listing_closed == False %}
     <div class="comment_section">

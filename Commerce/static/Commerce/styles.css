@@ -1,9 +1,12 @@
 body {
   background-color: #f2f0ea;
+  font-family: sans-serif;
 }
 .nav-logo {
     width: 170px; 
     height: 50px;
+    margin-left: 80px;
+    justify-content: center;
 }
 
 .centered {
@@ -33,17 +36,6 @@ body {
   height: 50vh;
   width: 300vh;
 }
-
-.btn {
-  margin: 15px;
-}
-
-.container {
-  padding: 30px;
-  display: flex;
-  align-items: center;
-}
-
 
 .form-title {
   font-size: 1.25rem;
@@ -90,11 +82,14 @@ body {
   text-transform: uppercase;
 }
 .header {
-  margin-top: 15px;
-  text-align: center;
-  color: #4F46E5;
-  font-weight: 500;
+  color: black;
+  font-weight: bold;
   font-size: 30px;
+}
+
+#price {
+  font-size: 25px;
+  color: rgb(102, 102, 102);
 }
 .signup-link {
   color: #6B7280;
@@ -116,6 +111,10 @@ body {
   padding: 20px;
 }
 
+.imglisting {
+  border: 1px solid black;
+}
+
 .img-background {
   position: absolute;
   top: 0;
@@ -130,6 +129,27 @@ body {
 .prodimg {
   display: block;
   max-width: 100%;
+  padding: 20px;
+}
+
+.alert-box {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  background-color: black;
+  color: white;
+  padding: 15px;
+  border-radius: 5px;
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#index-watch-button {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 5px;
 }
 
 .cardText {
@@ -264,6 +284,11 @@ then set the desired styles for .card-img. */
   transform: translateY(3px);
 }
 
+.btn-light {
+  border-radius: 100%;
+  width: 42px;
+  align-items: center;
+}
 #inputs {
   border: solid 1px;
   text-align: center;
@@ -300,34 +325,74 @@ then set the desired styles for .card-img. */
   margin-left: 50px;
   padding: 10px;
 }
-.image-view {
+#image-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin: 25px;
+}
+
+.img-container:hover {
+  transform: scale(1.05); /* Slightly increase the size of the container */
+  box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.3); /* Add a shadow for a popping effect */
+  border-radius: 5%;
+}
+
+.img-container:hover img {
+  transform: scale(1.05); /* Slightly increase the size of the image */
+}
+.image-box,
+.inner-container {
+  display: inline-block;
+  vertical-align: center;
+  margin-left: 600px;
+}
+.image-box {
   width: 600px;
-  height: 500px;
+  height: 450px;
+  justify-self: center;
+}
+.inner-container {
+  margin-left: 100px;
+}
+.imgBack {
+  position: absolute;
+  background-color: #a4a4a4;
+  width: 600px;
+  height: 450px;
+  z-index: -1; /* Place the background behind the image */
+  opacity: .2; /* Adjust opacity as needed */
+  border-radius: 5%;
+}
+.image-view {
+  width: 400px;
+  height: 400px;
+  padding: 20px;
   margin-left: auto;
   margin-right: auto;
 
 }
 
 #header-container {
-  height: 70px;
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: row;
 }
 
+.watch-button {
+  padding-left: 15px; 
+}
 .listin-view-image {
   display: inline-block;
 }
 
-.btn-light {
-  margin-top: 40px;
-}
-
-#image-container {
-  margin-top: 20px;
+.lower-card {
+  padding-top: 15px;
 }
 
 .form-container {
   display: flex;
   flex-direction: row;
+  justify-content: center;
 }
 
 #button-bid {

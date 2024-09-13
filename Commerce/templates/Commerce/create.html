@@ -1,12 +1,50 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-<h1 class="header">Create Listing</h1>
+<script>
+    function FileChoose(){
+        const FileInput = document.getElementById('image-input');
+        FileInput.click();
+    }
+    document.addEventListener('DOMContentLoaded', function() { 
+        // select file input element
+        var fileInput = document.getElementById('image-input');
+        // add event listener for the file input change
+        fileInput.addEventListener('change', function(event){
+            var file = event.target.files[0];
+
+            // select the preview image element
+            var previewImage = document.querySelector('.create-default');
+            // check if file is selected
+            if (file) {
+                // create filereader
+                var reader = new FileReader();
+                // set up the file reader onload event
+                reader.onload = function(e) {
+                    // set src attribute of preview image to the data's url
+                    previewImage.src = e.target.result;
+                };
+                //read the selected file as a date url
+                reader.readAsDataURL(file)
+            };
+        });
+        
+        
+    });
+      
+</script>
+<h1 id="center-header" class="header">Create Listing</h1>
 <div class="create-form">
-    <form enctype="multipart/form-data" action="{% url 'create_listing' %}" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button class="create-button" type="submit">Create</button>
-    </form>
+        <form enctype="multipart/form-data" action="{% url 'create_listing' %}" method="post">
+            {% csrf_token %}
+            <div class="default-preview">
+                <img class="create-default" src="/media/images/create_default.jpeg">
+                <button onclick="FileChoose()" type="button" class="btn btn-dark" id="custom-button">Choose Image</button>
+            </div>
+            {{ form }}
+            <div class="create-div">
+                <button class="create-button" type="submit">Create</button>
+            </div>
+        </form>
 </div>
 {% endblock %}

@@ -3,11 +3,15 @@
 {% block body %}
 <script>
     function Follow(id) {
-        let FollowerCount = document.querySelector(`#followers${id}`);
+        let FollowerCount =  document.querySelector(`#followers${id}`);
         let FollowingCount = document.querySelector(`#following${id}`);
+        let FollowList = document.createElement('div');
+        let newImgDiv = document.createElement('div');
+        let newLinkDiv = document.createElement('div');
         let newImg = document.createElement('img');
         let newLink = document.createElement('a');
         let modalBody = document.querySelector(`.modal-body${id}`);
+        let noFollows = document.querySelector('.noFollowers');
         newImg.id = `followerpfp${id}`;
         newLink.id = `followername${id}`;
     
@@ -25,12 +29,20 @@
         .then(data => {
             FollowerCount.innerHTML = data.data.followers;
             FollowingCount.innerHTML = data.data.following;
+            FollowList.className = `follower_list${data.data.follower_id}`;
+            newImgDiv.className = 'follower_pfp';
+            newLinkDiv.className = 'follower_name';
             newLink.innerHTML = data.data.follow_user;
             newImg.src = data.data.follower_pfp;
             newImg.id = `followerpfp${data.data.follower_id}`;
             newLink.id = `followername${data.data.follower_id}`;
-            modalBody.appendChild(newImg);
-            modalBody.appendChild(newLink);
+            newLink.href =  `/profile/${data.data.follower_id}`
+            noFollows.style.display = 'none';
+            newImgDiv.appendChild(newImg);
+            newLinkDiv.appendChild(newLink);
+            FollowList.appendChild(newImgDiv);
+            FollowList.appendChild(newLinkDiv);
+            modalBody.appendChild(FollowList);
             console.log('Followers:', data.data.followers, 'Following:', data.data.following, newImg.id, newLink.id)
         })
         .catch(error => console.log('ERROR:', error))
@@ -39,6 +51,9 @@
     function Unfollow(id) {
         let FollowerCount = document.querySelector(`#followers${id}`);
         let FollowingCount = document.querySelector(`#following${id}`);
+        const pfpFollower = document.querySelector('.followerPFP');
+        const noFollows = document.querySelector('.noFollowers');
+        const followerModal = document.querySelector('[class^="follower_list"]');
         fetch(`/unfollow/${id}`, {
             method: 'POST',
             headers: {
@@ -54,15 +69,145 @@
             FollowingCount.innerHTML = data.data.following;
             newImg = document.querySelector(`#followerpfp${data.data.follower_id}`);
             newLink = document.querySelector(`#followername${data.data.follower_id}`);
+            let FollowList = document.querySelector(`.follower_list${data.data.follower_id}`);
             newImg.src = data.data.follower_pfp;
             newImg.remove();
             newLink.remove();
+            FollowList.remove();
+            if (followerModal && pfpFollower) {
+                if (followerModal.contains(pfpFollower)) {
+                    noFollows.style.display = 'none';
+                } else {
+                    noFollows.style.display = 'block';
+                }
+            }else {
+                console.error('Elements not found');
+            }
             console.log('Followers:', data.data.followers, 'Following:', data.data.following, newImg.id, newLink.id)
         })
-        .catch(error => console.log('ERROR'))
+        .catch(error => console.log('ERROR', error))
+    }
+
+    function addWishlist(id, idListing) {
+        let wishlistIcon = document.getElementById(`wish-button${idListing}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        
+        fetch(`/add_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()  
+        })
+        .then(data => {
+            console.log('Listing added to wishlist by:', data.data.user);
+            console.log(listing_id);
+        })
+        .catch(error =>console.log('Error:', error));
+    }
+
+    function removeWishlist(id, idListing) {
+        let wishlistIcon = document.getElementById(`wish-button${idListing}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        fetch(`/remove_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()
+        })
+        .then(data => {
+            console.log('Listing removed from wishlist by:', data.data.user);
+            console.log(listing_id);
+        })
+        .catch(error =>console.log('Error:', error));
     }
 
     document.addEventListener('DOMContentLoaded' , function(){
+        const wishButtons = document.querySelectorAll('[id^="wish-button"]');
+        const solidHeartIcon = '<i class="fa-solid fa-heart" style="color: black;"></i>';
+        const regularHeartIcon = '<i class="fa-regular fa-heart" style="color: black;"></i>';
+        const pfpFollower = document.querySelector('.followerPFP');
+        const noFollows = document.querySelector('.noFollowers');
+        const followerModal = document.querySelector('[class^="follower_list"]');
+        
+        if (followerModal && pfpFollower) {
+            if (followerModal.contains(pfpFollower)) {
+                noFollows.style.display = 'none';
+            } else {
+                noFollows.style.display = 'block';
+            }
+        }else {
+            console.error('Elements not found');
+        }
+
+
+        wishButtons.forEach(button => {
+            button.addEventListener('mouseenter', function(){
+                // Check if the button contains the solid heart icon HTML
+                if (button.getAttribute('data-wishlist') === 'wish'){
+                    button.innerHTML = solidHeartIcon;
+                }
+            });
+            button.addEventListener('mouseleave', function(){
+                // Check if the button contains the solid heart icon HTML
+                if (button.getAttribute('data-wishlist') === 'wish') {
+                    button.innerHTML = regularHeartIcon;
+                }
+            });
+            button.addEventListener('click', function() {
+                let profileId = button.getAttribute('data-profile');
+                let idListing = button.getAttribute('data-listing');
+                currentState = button.getAttribute('data-wishlist');
+                console.log(profileId, currentState);
+                if (currentState === 'wish') {
+                    addWishlist(profileId, idListing );
+                    button.setAttribute('data-wishlist', 'wished');
+                    button.innerHTML = solidHeartIcon;
+                    showAlert('Added to wishlist');
+                } else if (currentState === 'wished') {
+                    removeWishlist(profileId, idListing);
+                    button.setAttribute('data-wishlist', 'wish');
+                    button.innerHTML = regularHeartIcon;
+                    showAlert('Removed from wishlist');
+                }
+            });
+        });
+        function showAlert(message) {
+            const alertBox = document.createElement('div');
+            alertBox.className = `alert-box`;
+            alertBox.textContent = message;
+
+            document.body.appendChild(alertBox);
+
+            // Show the alert box
+            setTimeout(() => {
+                alertBox.style.opacity = '1';
+            }, 100);
+
+            // Hide the alert box after 3 seconds
+            setTimeout(() => {
+                alertBox.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(alertBox);
+                }, 500);
+            }, 1000);
+        }
+        const BioProfile = document.querySelector('.profile_bio');
+        if (BioProfile){
+            const profileBio = document.querySelector('.profile_bio').innerHTML;
+            document.querySelector('#bio_field').innerHTML = profileBio;
+        }
         // select file input element
         var fileInput = document.getElementById('change_pic');
         // add event listener for the file input change
@@ -98,185 +243,244 @@
                 } else if (currentState === 'unfollow') {
                     Unfollow(FollowId);
                     button.setAttribute('data-state', 'follow');
-                    button.innerHTML = 'Follow';  
+                    button.innerHTML = 'Follow';
                 }
             });
         });
-        
     })
 </script>
-
-<h1 class="header">{{ profile.user }}</h1>
-<!-- Button trigger modal -->
-<button type="button" id="edit_profile" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-    Edit Profile
-  </button>
-  
-  <!-- Modal -->
-  <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Profile</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="upper-profile">
+    <div class="headerArea">
+        <div class="profileName">
+            <h1 id="center-header" class="header">{{ profile.user }}</h1>
         </div>
-        <div class="modal-body">
-            <h1>Change Profile Picture:</h1>
-            <div class="profile_picture">
-                {% if profile.profile_pic %}
-                    <img class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
-                {% else %}
-                    <img class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
-                {% endif %}
-            </div>
-            <div class="edit_pfp_div">
-                <button class="edit_pfp" type="button" style="display:block;width:120px; height:30px;" onclick="document.getElementById('change_pic').click()">Edit</button>
-            </div>
-            <div class="edit_bio">
-                <h1>Change Bio:</h1>
-                <form class="change_picture" action="" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ editprofileform }}
-                    <button style="display: none;" id="edit-form-button">submit</button>
-                </form>
-            </div>
+        {% if request.user.profile == profile %}
+        <div class="editProfile">
+            <button type="button" id="edit_profile" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <i class="fa-solid fa-pen-to-square" style="color: #000000;"></i>
+            </button>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary" onclick="document.getElementById('edit-form-button').click()">Make Changes</button>
-        </div>
-      </div>
+        {% endif %}
     </div>
-  </div>
-<div class="profile_picture">
-    {% if profile.profile_pic %}
-        <img class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
-    {% else %}
-        <img class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
-    {% endif %}
-</div>
-<div class="bio">
-    {% if profile_bio is not None %}
-        <p class="profile_bio">{{ profile.bio }}</p>
-    {% else %}
-        <p></p>
-    {% endif %}
-</div>
-<div class="follow-area">
-    {% if request.user.profile != profile %}
-        {% if user.is_authenticated %}
-            {% if request.user.profile in profile.followed_by.all %}
-                <form name="unfollow" action="" method="post">
-                    {% csrf_token %}
-                    <button id="followb" name="unfollow" type="button" class="btn btn-primary" data-follow="{{profile.user_id}}" data-state="unfollow">Following</button>
-                </form>
-            {% else %}
-                <form name="follow" action="" method="post">
-                    {% csrf_token %}
-                    <button id="followb" name="follow" type="button" class="btn btn-primary" data-follow="{{profile.user_id}}" data-state="follow">Follow</button>
-                </form>
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h1 class="modal-title fs-5" id="staticBackdropLabel">Edit Profile</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="picture-edit">
+                        {% if profile.profile_pic %}
+                            <img id="profile-edit" class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
+                        {% else %}
+                            <img id="profile-edit" class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
+                        {% endif %}
+                    <div class="edit_pfp_div">
+                        <button class="edit_pfp" type="button" onclick="document.getElementById('change_pic').click()"><i class="fa-solid fa-camera" style="color: #ffffff;"></i></button>
+                    </div>
+                </div>
+                <div class="edit_bio">
+                    <form class="change_picture" action="" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ editprofileform }}
+                        <button style="display: none;" id="edit-form-button">submit</button>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <button type="button" id="editButton" class="btn btn-dark" onclick="document.querySelector('.change_picture').submit()">Confirm</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="profile_picture">
+        {% if profile.profile_pic %}
+            <img class="profile_pic" src="{{ profile.profile_pic.url }}" alt="{{ profile.user}}">
+        {% else %}
+            <img class="profile_pic" src="../media/images/default_profile.png" alt="{{ profile.user }}">
+        {% endif %}
+    </div>
+    <div class="bio"> 
+        {% if profile.bio %}
+            <p class="profile_bio">{{ profile.bio }}</p>
+        {% else %}
+            <p></p>
+        {% endif %}
+    </div>
+    <div class="follow-area">
+        {% if request.user.profile != profile %}
+            {% if user.is_authenticated %}
+                {% if request.user.profile in profile.followed_by.all %}
+                    <form name="unfollow" action="" method="post">
+                        {% csrf_token %}
+                        <button id="followb" name="unfollow" type="button" class="btn btn-dark" data-follow="{{profile.user_id}}" data-state="unfollow">Following</button>
+                    </form>
+                {% else %}
+                    <form name="follow" action="" method="post">
+                        {% csrf_token %}
+                        <button id="followb" name="follow" type="button" class="btn btn-dark" data-follow="{{profile.user_id}}" data-state="follow">Follow</button>
+                    </form>
+                {% endif %}
             {% endif %}
         {% endif %}
-    {% endif %}
 
-    <div class="followed">
-        <div class="follow-left">
-            <p><b>Followers</b></p>
-            <a id='followers{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#following_label">{{ profile.followed_by.all|length }}</a>
+        <div class="followed">
+            <div class="follow-left">
+                <p><b>Followers</b></p>
+                <a id='followers{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#following_label">{{ profile.followed_by.all|length }}</a>
 
-            <div class="modal fade" id="following_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                  <div class="modal-content">
-                    <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="following_label">Modal title</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal fade" id="following_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="following_label">Followers</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body{{profile.user_id}}">
+                                {% for following in followings %}
+                                <div class="follower_list{{following.user.id}}">
+                                    <div class="follower_pfp">
+                                        {% if following.user.profile.profile_pic %}
+                                            <img class="followerPFP" id="followerpfp{{following.user.id}}" src="{{ following.user.profile.profile_pic.url }}">
+                                        {% else %}
+                                            <img class="followerPFP" id="followerpfp{{following.user.id}}" src="../media/images/default_profile.png">
+                                        {% endif %}
+                                    </div>
+                                    <div class="follower_name">
+                                        <a id="followername{{following.user.id}}" href="{% url 'profile' profile_id=following.user.id %}">{{ following.user.profile }}</a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                        <p class="noFollowers">No followers yet</p>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
-                    <div class="modal-body{{profile.user_id}}">
-                      {% for following in followings %}
-                          {% if following.user.profile.profile_pic %}
-                              <img id="followerpfp{{following.user.id}}" src="{{ following.user.profile.profile_pic.url }}">
-                          {% else %}
-                              <img id="followerpfp{{following.user.id}}" src="../media/images/default_profile.png">
-                          {% endif %}
-                          <a id="followername{{following.user.id}}" href="{% url 'profile' profile_id=following.user.id %}">{{ following.user.profile }}</a>
+                    </div>
+                </div>
+            </div>
+            <div class="follow-right">
+                <p><b>Following</b></p>
+                <a id='following{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#followers_label">{{ profile.follow.all|length }}</a>
+            
+                <!-- Modal -->
+                <div class="modal fade" id="followers_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Following</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        
+                        {% for follower in followers %}
+                        <div class="following_list{{follower.user.id}}">
+                            <div class="follower_pfp">
+                                {% if follower.user.profile.profile_pic %}
+                                    <img class="followerPFP" id="followerpfp{{follower.user.id}}" src="{{ follower.user.profile.profile_pic.url }}">
+                                {% else %}
+                                    <img class="followerPFP" id="followerpfp{{follower.user.id}}" src="../media/images/default_profile.png">
+                                {% endif %}
+                            </div>
+                            <div class="follower_name">
+                                <a id="followername{{follower.user.id}}" href="{% url 'profile' profile_id=follower.user.id %}">{{ follower.user.profile }}</a>
+                            </div>
+                        </div>
                         {% empty %}
-                        No followers yet
-                      {% endfor %}
+                            <p class="noFollowing">Following nobody</p>
+                        {% endfor %}
                     </div>
                     <div class="modal-footer">
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
-                  </div>
+                    </div>
                 </div>
-              </div>
-        </div>
-        <div class="follow-right">
-            <p><b>Following</b></p>
-            <a id='following{{profile.user_id}}' class="follow-links" data-bs-toggle="modal" data-bs-target="#followers_label">{{ profile.follow.all|length }}</a>
-          
-            <!-- Modal -->
-            <div class="modal fade" id="followers_label" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div class="modal-dialog">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                  </div>
-                  <div class="modal-body">
-                    {% for follower in followers %}
-                        {% if follower.user.profile.profile_pic %}
-                            <img src="{{ follower.user.profile.profile_pic.url }}">
-                        {% else %}
-                            <img src="../media/images/default_profile.png">
-                        {% endif %}
-                        <a href="{% url 'profile' profile_id=follower.user.id %}">{{ follower.user.profile }}</a>
-                    {% empty %}
-                        Following nobody
-                    {% endfor %}
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  </div>
                 </div>
-              </div>
             </div>
         </div>
     </div>
 </div>
-
-<h2>Listings Posted</h2>
-<div class="row row-cols-1 row-cols-md-5 g-1 m-5">
+<div class="container">
+    <h2 id="profileHeader" class="header">Listings Posted</h2>
+    <div id="smallRow" class="row">
     {% for listing in listings %}
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
-                <div class="card-title">{{ listing.listing_name }}</div>
-                <div id="closed-footer" class="card-footer">
-                    <a class="closed-link" href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
+    <div id="smallColumn" class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smallimg-container" class="img-container">
+                <div class="img-background"></div>
+                <div class="prodimg"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div>
+        </a>
+                <div id="index-watch-button" class="watch-button">
+                    {% if user.is_authenticated and listing.listing_closed == False %}
+                        {% if request.user.profile in listing.listing_wishlist.all %}
+                            <button id="wish-button{{listing.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                                <i class="fa-solid fa-heart" style="color: black;"></i>
+                            </button>
+                        {% else %}
+                            <button id="wish-button{{listing.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                                <i class="fa-regular fa-heart" style="color: black;"></i>
+                            </button>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
-        </div>
-    {% empty %}
-        <p>No listings yet</p>
-    {% endfor %}
-</div>
-<h2>Auctions Won</h2>
-<div class="row row-cols-1 row-cols-md-5 g-1 m-5">
-    {% for win in wins %}
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-img"><div class="img"><img src="{{ win.listing_image.url }}" alt="{{win.listing_name}}"></div></div>
-                <div class="card-title">{{ win.listing_name }}</div>
-                <div id="closed-footer" class="card-footer">
-                    <a class="closed-link" href="{% url 'listing' listing_id=win.id %}"><button class="card-btn">View</button></a>
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smaller-lower-card" class="lower-card">
+                <div class="titleCard">
+                    <p class="cardText">{{ listing.listing_name }}</p>
                 </div>
+                <small class="listingAuthor">Listed by {{ listing.listing_user }}</small>
+                    <div class="priceCard">
+                        {% if listing.listing_bid_price is none %}
+                            <p class="cardText">$ {{ listing.listing_price }}</p>
+                        {% else %}
+                            <p class="cardText">$ {{ listing.listing_bid_price }}</p>
+                        {% endif %}
+                    </div>
             </div>
-        </div>
-    {% empty %}
-        <p>No winning auctions yet</p>
-    {% endfor %}
+        </a>                          
+    </div>
+{% endfor %}
 </div>
-
+</div>
+<div class="container">
+<h2 id="profileHeader" class="header">Auctions Won</h2>
+    <div id="smallRow" class="row">
+    {% for listing in wins %}
+    <div id="smallColumn" class="col-3 col-sm-3 col-md-3 col-lg-3 mb-3">
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smallimg-container" class="img-container">
+                <div class="img-background"></div>
+                <div class="prodimg"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div>
+        </a>
+            </div>
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smaller-lower-card" class="lower-card">
+                <div class="titleCard">
+                    <p class="cardText">{{ listing.listing_name }}</p>
+                </div>
+                <small class="listingAuthor">Listed by {{ listing.listing_user }}</small>
+                    <div class="priceCard">
+                        {% if listing.listing_bid_price is none %}
+                            <p class="cardText">$ {{ listing.listing_price }}</p>
+                        {% else %}
+                            <p class="cardText">$ {{ listing.listing_bid_price }}</p>
+                        {% endif %}
+                    </div>
+            </div>
+        </a>                          
+    </div>
+</div>
+    {% empty %}
+        <div class="noAuctions">
+            <p class="noAuctions">No winning auctions yet</p>
+        </div>
+    {% endfor %}
+    </div>
+</div>
 
 
 {% endblock %}

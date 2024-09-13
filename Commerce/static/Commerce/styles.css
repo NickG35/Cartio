@@ -333,7 +333,7 @@ a {
 }
 /* <main-style> ============================ */
 .menu__link {
-  color: black;
+  color: white;
   line-height: 2;
   position: relative;
   padding-right: 4px;
@@ -344,7 +344,7 @@ a {
 }
 
 .carouselCaption {
-  color:#f2f0ea;
+  color:white;
 }
 
 .carousel-caption {
@@ -352,14 +352,16 @@ a {
   max-height: 100px;
   margin-left: auto;
   margin-right: auto;
+  background-color: rgba(164, 164, 164, 0.2);
+  border-radius: 5%;
 }
 
 .menu__link::before {
   content: '';
   width: 6px;
   height: 6px;
-  border-top: solid 2px black;
-  border-right: solid 2px black;
+  border-top: solid 2px white;
+  border-right: solid 2px white;
   border-radius: 2px;
   position: absolute;
   top: 50%;

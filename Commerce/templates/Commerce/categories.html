@@ -1,20 +1,141 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <h1 class="header">{{ category_name }}</h1>
-    <div class="row row-cols-1 row-cols-md-4 g-4">
+<script>
+    function addWishlist(id, idListing) {
+        let wishlistIcon = document.getElementById(`wish-button${idListing}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        console.log(listing_id);
+        
+        fetch(`/add_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()  
+        })
+        .then(data => {
+            console.log('Listing added to wishlist by:', data.data.user);
+            console.log(listing_id);
+        })
+        .catch(error =>console.log('Error:', error));
+    }
+
+    function removeWishlist(id, idListing) {
+        let wishlistIcon = document.getElementById(`wish-button${idListing}`);
+        const listing_id = wishlistIcon.getAttribute('data-listing');
+        console.log(listing_id);
+        fetch(`/remove_wish/${id}`, {
+            method: 'POST',
+            headers: {
+                'Content-type': 'application/json', "X-CSRFTOKEN": "{{csrf_token}}",
+            },
+            body: JSON.stringify({
+                listingId: listing_id
+            })
+        })
+        .then (response => {
+            return response.json()
+        })
+        .then(data => {
+            console.log('Listing removed from wishlist by:', data.data.user);
+            console.log(listing_id);
+        })
+        .catch(error =>console.log('Error:', error));
+    }
+    document.addEventListener('DOMContentLoaded', function(event) {
+        const wishButtons = document.querySelectorAll('[id^="wish-button"]');
+        const solidHeartIcon = '<i class="fa-solid fa-heart" style="color: black;"></i>';
+        const regularHeartIcon = '<i class="fa-regular fa-heart" style="color: black;"></i>';
+        wishButtons.forEach(button => {
+            button.addEventListener('mouseenter', function(){
+                // Check if the button contains the solid heart icon HTML
+                if (button.getAttribute('data-wishlist') === 'wish'){
+                    button.innerHTML = solidHeartIcon;
+                }
+            });
+            button.addEventListener('mouseleave', function(){
+                // Check if the button contains the solid heart icon HTML
+                if (button.getAttribute('data-wishlist') === 'wish') {
+                    button.innerHTML = regularHeartIcon;
+                }
+            });
+            button.addEventListener('click', function() {
+                let profileId = button.getAttribute('data-profile');
+                let idListing = button.getAttribute('data-listing');
+                currentState = button.getAttribute('data-wishlist');
+                console.log(profileId, currentState);
+                if (currentState === 'wish') {
+                    addWishlist(profileId, idListing );
+                    button.setAttribute('data-wishlist', 'wished');
+                    button.innerHTML = solidHeartIcon;
+                    showAlert('Added to wishlist');
+                } else if (currentState === 'wished') {
+                    removeWishlist(profileId, idListing);
+                    button.setAttribute('data-wishlist', 'wish');
+                    button.innerHTML = regularHeartIcon;
+                    showAlert('Removed from wishlist');
+                }
+            });
+        });
+        function showAlert(message) {
+            const alertBox = document.createElement('div');
+            alertBox.className = `alert-box`;
+            alertBox.textContent = message;
+
+            document.body.appendChild(alertBox);
+
+            // Show the alert box
+            setTimeout(() => {
+                alertBox.style.opacity = '1';
+            }, 100);
+
+            // Hide the alert box after 3 seconds
+            setTimeout(() => {
+                alertBox.style.opacity = '0';
+                setTimeout(() => {
+                    document.body.removeChild(alertBox);
+                }, 500);
+            }, 1000);
+        }
+    });
+</script>
+<!-- the wishlist that was already wished for works but the new ones aren't allowing it, proofread code-->
+    <h1 id="center-header" class="header">{{ category_name }}</h1>
+    <div class="container">
+        <div id="smallRow" class="row">
         {% for category in categories %}
-            <div class="col">
-                <a href="{% url 'listing' listing_id=category.id %}">
-                    <div class="img-container">
-                        <div class="img-background"></div>
-                        <div class="prodimg"><img src="{{ category.listing_image.url }}" alt="{{category.listing_name}}"></div>
+        <div id="smallColumn" class="col-4 col-sm-4 col-md-4 col-lg-4">
+            <a href="{% url 'listing' listing_id=category.id %}">
+                <div id="smallimg-container" class="img-container">
+                    <div class="img-background"></div>
+                    <div class="prodimg"><img src="{{ category.listing_image.url }}" alt="{{category.listing_name}}"></div>
+            </a>
+                    <div id="index-watch-button" class="watch-button">
+                        {% if user.is_authenticated %}
+                            {% if request.user.profile in category.listing_wishlist.all and category.listing_closed == False %}
+                                <button id="wish-button{{category.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{category.id}}" data-wishlist="wished">
+                                    <i class="fa-solid fa-heart" style="color: black;"></i>
+                                </button>
+                            {% else %}
+                                <button id="wish-button{{category.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{category.id}}" data-wishlist="wish">
+                                    <i class="fa-regular fa-heart" style="color: black;"></i>
+                                </button>
+                            {% endif %}
+                        {% endif %}
                     </div>
-                    <div class="lower-card">
-                        <div class="titleCard">
-                            <p class="cardText">{{ category.listing_name }}</p>
-                        </div>
-                        <small class="listingAuthor">Listed by {{ category.listing_user }}</small>
+                </div>
+            <a href="{% url 'listing' listing_id=category.id %}">
+                <div id="smaller-lower-card" class="lower-card">
+                    <div class="titleCard">
+                        <p class="cardText">{{ category.listing_name }}</p>
+                    </div>
+                    <small class="listingAuthor">Listed by {{ category.listing_user }}</small>
                         <div class="priceCard">
                             {% if category.listing_bid_price is none %}
                                 <p class="cardText">$ {{ category.listing_price }}</p>
@@ -22,9 +143,10 @@
                                 <p class="cardText">$ {{ category.listing_bid_price }}</p>
                             {% endif %}
                         </div>
-                    </div>
-                </a>                          
-            </div>
-        {% endfor %}
+                </div>
+            </a>                          
+        </div>
+    {% endfor %}
     </div>
+</div>
 {% endblock %}

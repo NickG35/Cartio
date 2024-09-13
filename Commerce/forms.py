@@ -55,7 +55,7 @@ class CommentForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(ModelForm, self).__init__(*args, **kwargs)
         self.fields['comment_comment'].widget.attrs["id"] = "comment_form"
-        self.fields['comment_comment'].widget.attrs["placeholder"] = "Leave a comment..."
+        self.fields['comment_comment'].widget.attrs["placeholder"] = "Leave a review..."
         self.fields['comment_comment'].label = ""
 
 class EditProfileForm(ModelForm):
@@ -70,7 +70,7 @@ class EditProfileForm(ModelForm):
         super(EditProfileForm, self).__init__(*args, **kwargs)
         self.fields['profile_pic'].label = ""
         self.fields['profile_pic'].widget.attrs["id"] = "change_pic" 
-        self.fields['bio'].widget.attrs["placeholder"] = "write a bio"
+        self.fields['bio'].widget.attrs["placeholder"] = "write a bio..."
         self.fields['bio'].widget.attrs["id"] = "bio_field"
         self.fields['bio'].label = ""
 

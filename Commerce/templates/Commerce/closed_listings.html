@@ -2,19 +2,49 @@
 
 {% block body %}
 
-<h2 class="header">Closed Listings</h2>
+<h2 id="center-header" class="header">Closed Listings</h2>
 
-    <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
+<div class="container">
+    <div id="smallRow" class="row">
     {% for listing in closed_listings %}
-        <div class="col">
-            <div class="card h-100">
-                <div class="card-img"><div class="img"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div></div>
-                <div class="card-title">{{ listing.listing_name }}</div>
-                <div id="closed-footer" class="card-footer">
-                    <a class="closed-link" href="{% url 'listing' listing_id=listing.id %}"><button class="card-btn">View</button></a>
+    <div id="smallColumn" class="col-4 col-sm-4 col-md-4 col-lg-4">
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smallimg-container" class="img-container">
+                <div class="img-background"></div>
+                <div class="prodimg"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div>
+        </a>
+                <div id="index-watch-button" class="watch-button">
+                    {% if user.is_authenticated %}
+                        {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
+                            <button id="wish-button{{listing.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                                <i class="fa-solid fa-heart" style="color: black;"></i>
+                            </button>
+                        {% else %}
+                            <button id="wish-button{{listing.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                                <i class="fa-regular fa-heart" style="color: black;"></i>
+                            </button>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
-        </div>
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div id="smaller-lower-card" class="lower-card">
+                <div class="titleCard">
+                    <p class="cardText">{{ listing.listing_name }}</p>
+                </div>
+                <small class="listingAuthor">Listed by {{ listing.listing_user }}</small>
+                    <div class="priceCard">
+                        {% if listing.listing_bid_price is none %}
+                            <p class="cardText">$ {{ listing.listing_price }}</p>
+                        {% else %}
+                            <p class="cardText">$ {{ listing.listing_bid_price }}</p>
+                        {% endif %}
+                    </div>
+            </div>
+        </a>                          
+    </div>
     {% endfor %}
+    </div>
+</div>
 
 {% endblock %}

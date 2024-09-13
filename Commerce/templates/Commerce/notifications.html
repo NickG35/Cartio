@@ -1,38 +1,41 @@
 {% extends "Commerce/layout.html" %}
-{% load humanize %}
+{% load custom_filters %}
 {% block body %}
-<ul class="noti-page-list">
-  <li class="more-noti"><b>Notifications</b></li>
-  {% for notif in notifs|dictsortreversed:"noti_time" %}
-  {% if notif.noti_follower %}
-    {% if notif.noti_follower.profile_pic %}
-      <li><a id="noti{{noti.id}}" class="dropdown-item"  data-reading="false" data-id="{{notif.noti_read}}" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_follower.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">{{ notif.noti_follower }} started following you</span></a><span class="noti-time"><div class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></li>
-    {% else %}
-      <li><a id="noti{{noti.id}}" class="dropdown-item"  data-reading="false" data-id="{{notif.noti_read}}" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}"><span id="noti-badge"></span><img class="comment-pic" src="../media/images/default_profile.png"><div class='noti-content'><span class="noti-writing">{{ notif.noti_follower }} started following you</span></a><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></li>
-    {% endif %}
-  {% elif notif.noti_bid %}
-    {% if notif.noti_bid == request.user.profile %}
-      {% if notif.noti_bid.profile_pic %}
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">You just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
-      {% else %}
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><img class="comment-pic" src="../media/images/default_profile.png"><div class='noti-content'><span class="noti-writing">You just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
-      {% endif %}
-    {% else %}  
-      {% if notif.noti_bid.profile_pic %}                
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">{{ notif.noti_bid }} has just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>      
-      {% else %}
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><img class="comment-pic" src="../media/images/default_profile.png"><div class='noti-content'><span class="noti-writing">{{notif.noti_bid}} just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
-      {% endif %}                 
-    {% endif %}
-  {% elif notif.noti_winner %}
-      {% if notif.noti_winner.profile_pic %}
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><img class="comment-pic" src="{{notif.noti_winner.profile_pic.url}}"><div class='noti-content'><span class="noti-writing">Congratulations, {{ notif.noti_winner }}! You just won the auction<i class="noti_listing">{{notif.noti_listing }}.</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li> 
-      {% else %} 
-        <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><img class="comment-pic" src="../media/images/default_profile.png"><div class='noti-content'><span class="noti-writing">Congratulations, {{ notif.noti_winner }}! You just won the auction<i class="noti_listing">{{notif.noti_listing }}.</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>   
-      {% endif %}
-  {% endif %}
-{% empty %}
-  <li><a id="noti{{notif.id}}" class="dropdown-item" href="">No notifications to display</a></li>
-</ul>
+<div class="noti-group">
+  <ul class="noti-page-list">
+    <li  class="more-noti"><b>Notifications</b></li>
+      {% for notif in notifs|dictsortreversed:"noti_time" %}
+            {% if notif.noti_follower %}
+              {% if notif.noti_follower.profile_pic %}
+                <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}"><span id="noti-badge "></span><div class="navPFP"><img class="comment-pic" src="{{notif.noti_follower.profile_pic.url}}"></div><div class='noti-content'><span class="noti-writing">{{ notif.noti_follower }} started following you</span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
+              {% else %}
+                <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'profile' profile_id=notif.noti_follower.user.id %}"><span id="noti-badge "></span><div class="navPFP"><img class="comment-pic" src="../media/images/default_profile.png"><div><div class='noti-content'><span class="noti-writing">{{ notif.noti_follower }} started following you</span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
+              {% endif %}
+            {% elif notif.noti_bid %}
+              {% if notif.noti_bid == request.user.profile %}
+                {% if notif.noti_bid.profile_pic %}
+                  <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><div class="navPFP"><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"></div><div class='noti-content'><span class="noti-writing">You just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
+                {% else %}
+                  <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge "></span><div class="navPFP"><img class="comment-pic" src="../media/images/default_profile.png"></div><div class='noti-content'><span class="noti-writing">You just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div></b><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>
+                {% endif %}
+              {% else %}  
+                {% if notif.noti_bid.profile_pic %}                
+                  <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><div class="navPFP"><img class="comment-pic" src="{{notif.noti_bid.profile_pic.url}}"></div><div class='noti-content'><span class="noti-writing">{{ notif.noti_bid }} has just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>      
+                {% else %}
+                  <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><div class="navPFP"><img class="comment-pic" src="../media/images/default_profile.png"></div><div class='noti-content'><span class="noti-writing">{{ notif.noti_bid }} has just bid on your listing<i class="noti_listing">{{notif.noti_listing }}</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li> 
+                {% endif %}                 
+              {% endif %}
+            {% elif notif.noti_winner %}
+              {% if notif.noti_winner.profile_pic %}
+                <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><div class="navPFP"><img class="comment-pic" src="{{notif.noti_winner.profile_pic.url}}"></div><div class='noti-content'><span class="noti-writing">Congratulations, {{ notif.noti_winner }}! You just won the auction<i class="noti_listing">{{notif.noti_listing }}.</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li>    
+              {% else %} 
+                <li><a id="noti{{notif.id}}" class="dropdown-item"  data-reading="{{notif.noti_read}}" data-id="{{notif.id}}" href="{% url 'listing' listing_id=notif.noti_listing.id %}"><span id="noti-badge"></span><div class="navPFP"><img class="comment-pic" src="../media/images/default_profile.png"></div><div class='noti-content'><span class="noti-writing">Congratulations, {{ notif.noti_winner }}! You just won the auction<i class="noti_listing">{{notif.noti_listing }}.</i></span><div class="noti-time"><span class="noti-time"><small>{{notif.noti_time|simple_naturaltime}}</small></span></div><i class="fa-solid fa-circle fa-2xs" style="color: #dc3545;"></i></div></a></li> 
+              {% endif %}
+            {% endif %}
+                              
+      {% empty %}
+        <li><a id="noti{{notif.id}}" class="dropdown-item" href="">No notifications to display</a></li>
+  </ul>
+</div>
   {% endfor %}
 {% endblock %}

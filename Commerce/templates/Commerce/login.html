@@ -2,7 +2,6 @@
 
 {% block body %}
 <div class="parent-container">
-  <div class="container">
       <form action="{% url 'login' %}" method="post" class="form">
         {% csrf_token %}
         <p class="form-title">Sign in to your account</p>
@@ -22,6 +21,5 @@
         <a class="form-link" href="{% url 'register' %}">Register</a>
       </p>
       </form>
-  </div>
 </div>
 {% endblock %}

@@ -2,39 +2,135 @@ body {
   background-color: #f2f0ea;
   font-family: sans-serif;
 }
+
+.dark-mode {
+  background-color: black;
+}
 .nav-logo {
     width: 170px; 
     height: 50px;
     margin-left: 80px;
     justify-content: center;
 }
+.parent-container {
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+  min-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+}
+.bg-light {
+  min-width: 320px;
+}
 
+.navbar-toggler {
+  display: none;
+}
 .centered {
   margin: 15px;
   text-align: center;
 }
 
+.headerArea{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#editButton {
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+}
+
+.profileName, 
+.editProfile {
+  margin-top: 20px;
+  padding: 5px;
+  align-items: center;
+  position: relative;
+}
+.default-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column; /* Optional: centers content vertically */
+}
+
+.create-default {
+  width: 150px; /* Set the desired width */
+  height: 150px; /* Set the desired height */
+  object-fit: cover; /* Ensures the image covers the box, cropping as needed */
+  border-radius: 8px; /* Optional: adds rounded corners */
+  border: 1px solid #ccc; /* Optional: adds a border */
+}
+
+div[class^="modal-body"]{
+  background-color: black;
+  color: white;
+}
+div[class^="follower_list"], div[class^="following_list"] {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+.follower_pfp {
+  display: flex;
+  flex-direction: column;
+}
+
+img[id^="followerpfp"]{
+  border: 1px solid lightgray;
+  border-radius: 100%;
+  width: 40px;
+  height: 40px;
+}
+.follower_name {
+  align-items: center;
+  width: 50px;
+  padding-left: 10px;
+  align-items: center;
+}
 .error {
   color: red;
   text-align: center;
   font-size: 12px;
+  padding: 10px;
 }
 
+#center-header {
+  text-align: center;
+  margin:20px;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.profile_headers {
+  margin-top: 40px;
+}
 .form {
   background-color: #fff;
-  display: block;
   padding: 1rem;
   max-width: 350px;
+  min-width: 300px;
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-.parent-container {
+#listingsContainer {
+  justify-content: center; /* Adjust as needed */
+  padding: 30px;
+}
+
+#listingsRow {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 50vh;
-  width: 300vh;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Adjust as needed */
+  padding-left: 60px;
 }
 
 .form-title {
@@ -61,7 +157,7 @@ body {
   padding-right: 3rem;
   font-size: 0.875rem;
   line-height: 1.25rem;
-  width: 300px;
+  width: 100%;
   border-radius: 0.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
@@ -72,7 +168,7 @@ body {
   padding-bottom: 0.75rem;
   padding-left: 1.25rem;
   padding-right: 1.25rem;
-  background-color: #4F46E5;
+  background-color: black;
   color: #ffffff;
   font-size: 0.875rem;
   line-height: 1.25rem;
@@ -83,12 +179,29 @@ body {
 }
 .header {
   color: black;
-  font-weight: bold;
-  font-size: 30px;
+  font-size: 25px;
+  text-align: center;
 }
+
+.d-block {
+  width: 100%;
+  height: 500px;
+}
+
+#carouselExampleIndicators {
+  width: 100%;
+  height: 500px;
+}
+
+
+
+
 
 #price {
   font-size: 25px;
+  margin: 0px;
+  text-align: left;
+  font-weight: bold;
   color: rgb(102, 102, 102);
 }
 .signup-link {
@@ -102,13 +215,26 @@ body {
   text-decoration: underline;
 }
 
+#carouselContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .img-container {
   position: relative;
-  display: inline-block;
-  max-width: 250px;
-  height: 350px;
-  justify-content: center;
-  padding: 20px;
+  display: flex;
+  justify-content: flex-start;
+  width: 200px;
+  height: 320px;
+}
+
+#smallimg-container {
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: flex-start;
+  display: block;
+
 }
 
 .imglisting {
@@ -126,10 +252,38 @@ body {
   opacity: .2; /* Adjust opacity as needed */
   border-radius: 5%;
 }
+
+
+#smallColumn {
+  max-width: 300px;
+  justify-content: center;
+}
+
+#profileHeader {
+  margin: 20px 0px;
+}
+
+#smallRow {
+  max-width: 900px;
+  min-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  justify-content: center;
+}
+
 .prodimg {
   display: block;
-  max-width: 100%;
+  width: 100%;
   padding: 20px;
+}
+
+.bidFormBlock{
+  display: none;
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  padding: 10px 25px 10px 0;
 }
 
 .alert-box {
@@ -145,7 +299,7 @@ body {
   transition: opacity 0.5s ease-in-out;
 }
 
-#index-watch-button {
+#index-watch-button{
   position: absolute;
   bottom: 0;
   right: 0;
@@ -155,33 +309,67 @@ body {
 .cardText {
   font-family: arial;
   font-weight:bold;
+  font-size: 20px;
 }
 
-.col {
-  width: 270px;
-}
-
-.d-block {
-  width: 94%;
-  height: 500px;
-}
-
-#carouselExampleIndicators {
-  width: 59%;
-  margin-left: auto;
-  margin-right: auto;
-  padding-bottom: 10px;
-}
-.row {
-  width: 60%;
+.listing-section{
   display: flex;
-  margin-left: auto;
-  margin-right: auto;
+  justify-content: center;
 }
+
+#smallerRow {
+  justify-content: center;
+
+}
+
 
 #bottom-nav {
   margin-left: auto;
   margin-right: auto;
+}
+
+a {
+  text-decoration: none;
+}
+/* <main-style> ============================ */
+.menu__link {
+  color: black;
+  line-height: 2;
+  position: relative;
+  padding-right: 4px;
+}
+
+.menu__link:hover {
+  text-decoration: underline;
+}
+
+.carouselCaption {
+  color:#f2f0ea;
+}
+
+.carousel-caption {
+  max-width: 200px;
+  max-height: 100px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.menu__link::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-top: solid 2px black;
+  border-right: solid 2px black;
+  border-radius: 2px;
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  transform: translateY(-50%) rotate(45deg);
+  transition: transform .4s;
+}
+
+.menu__link:hover::before {
+  transform: translateX(4px) translateY(-50%) rotate(45deg);
 }
 
 .nav-pfp {
@@ -196,6 +384,7 @@ body {
   color: gray;
   font-family: arial;
   font-weight: bold;
+  font-size: 18px;
 }
 /* before adding the img to the div with the 
 "card-img" class, remove css styles 
@@ -284,37 +473,61 @@ then set the desired styles for .card-img. */
   transform: translateY(3px);
 }
 
-.btn-light {
-  border-radius: 100%;
-  width: 42px;
-  align-items: center;
-}
-#inputs {
-  border: solid 1px;
-  text-align: center;
-  margin: 10px;
+.btn-close {
+  background-color: white;
+  color: white;
+  border: none;
 }
 
+.btn-dark {
+  width: 120px;
+}
+.btn-light {
+  border-radius: 100%;
+}
+
+#inputs {
+  border-bottom: solid 2px black;
+  text-align: center;
+  margin: 10px;
+  background-color: white;
+  color: black;
+}
+
+#inputs::placeholder{
+  color: black;
+}
+
+
+#custom-button {
+  margin: 10px;
+  padding: 5px; 
+}
 .create-form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  max-width: 350px;
-  padding: 10px;
+  max-width: 450px;
+  height: 520px;
+  padding: 20px;
   border-radius: 10px;
-  border: 3px solid purple;
+  border: 3px solid black;
   position: relative;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
   margin-top: 10px;
+  background-color: lightgray;
+  color: black;
 }
 
+.create-div {
+  margin-top: 10px;
+}
 .create-form label #inputs {
   position: absolute;
   left: 10px;
   top: 15px;
-  color: grey;
   font-size: 0.9em;
   cursor: text;
   transition: 0.3s ease;
@@ -324,13 +537,45 @@ then set the desired styles for .card-img. */
   text-align: center;
   margin-left: 50px;
   padding: 10px;
+  display: none;
 }
-#image-container {
+
+
+.commentnhead, .image-box, .inner-container {
+  padding: 50px;
+  height: auto;
+  width: 33%;
+}
+
+
+.picture-edit {
   position: relative;
   display: flex;
   align-items: center;
-  margin: 25px;
+  border: 1px solid darkgray;
+  border-radius: 50%;
+  height: 200px;
+  width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 200px;
+  max-height: 200px;
 }
+.profile_picture{
+  position: relative;
+  border: 1px solid lightgray;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  height: 250px;
+  width: 250px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 250px;
+  max-height: 250px;
+}
+
+
 
 .img-container:hover {
   transform: scale(1.05); /* Slightly increase the size of the container */
@@ -341,32 +586,26 @@ then set the desired styles for .card-img. */
 .img-container:hover img {
   transform: scale(1.05); /* Slightly increase the size of the image */
 }
-.image-box,
-.inner-container {
-  display: inline-block;
-  vertical-align: center;
-  margin-left: 600px;
-}
 .image-box {
-  width: 600px;
-  height: 450px;
-  justify-self: center;
-}
-.inner-container {
-  margin-left: 100px;
-}
-.imgBack {
-  position: absolute;
-  background-color: #a4a4a4;
-  width: 600px;
-  height: 450px;
-  z-index: -1; /* Place the background behind the image */
-  opacity: .2; /* Adjust opacity as needed */
-  border-radius: 5%;
-}
-.image-view {
-  width: 400px;
+  position: relative;
+  display: inline-block;
   height: 400px;
+  border-radius: 5px;
+  background-color: rgba(164, 164, 164, 0.2);
+}
+
+#meatball-menu {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 5px;
+  font-size: 1.5em;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.image-view {
+  width: 100%;
   padding: 20px;
   margin-left: auto;
   margin-right: auto;
@@ -378,20 +617,35 @@ then set the desired styles for .card-img. */
   flex-direction: row;
 }
 
+#mobile-header-container {
+  display: none;
+}
+
+#listingRow {
+  align-items: center;
+  padding: 60px;
+}
+
 .watch-button {
-  padding-left: 15px; 
+  padding-left: 15px;
 }
 .listin-view-image {
   display: inline-block;
 }
 
 .lower-card {
-  padding-top: 15px;
+  padding: 15px;
+  width: 250px;
+}
+
+#smaller-lower-card {
+  margin-left: auto;
+  margin-right: auto;
+  width: 200px;
 }
 
 .form-container {
   display: flex;
-  flex-direction: row;
   justify-content: center;
 }
 
@@ -402,60 +656,188 @@ then set the desired styles for .card-img. */
   border: 1px solid;
 }
 
-.input-add-on {
-  height: 27px;
-  width: 50px;
+.bid-price {
+  padding: 20px;
+  margin-bottom: auto;
+}
+
+.boton-elegante {
+  padding: 8px 30px;
+  border: 2px solid #2c2c2c;
+  background-color: #1a1a1a;
+  color: #ffffff;
+  font-size: 16px;
   cursor: pointer;
-  border: 0;
-  background-color: whitesmoke;
-  box-shadow: rgb(0 0 0 / 5%) 0 0 8px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  font-size: 15px;
-  transition: all 0.5s ease;
+  border-radius: 30px;
+  transition: all 0.4s ease;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  font-weight: bold;
+  height: 40px;
+  width: 90px;
+  margin: 10px;
 }
 
-.input-add-on:hover {
-  letter-spacing: 3px;
-  background-color: hsl(261deg 80% 48%);
-  color: hsl(0, 0%, 100%);
-  box-shadow: rgb(93 24 220) 0px 7px 29px 0px;
+.boton-elegante::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  transform: scale(0);
+  transition: transform 0.5s ease;
 }
 
-.input-add-on:active {
-  letter-spacing: 3px;
-  background-color: hsl(261deg 80% 48%);
-  color: hsl(0, 0%, 100%);
-  box-shadow: rgb(93 24 220) 0px 0px 0px 0px;
-  transform: translateY(10px);
-  transition: 100ms;
+.boton-elegante:hover::after {
+  transform: scale(4);
 }
 
-#comment_form {
-  border: 1px solid;
-  width: 700px;
+.boton-elegante:hover {
+  border-color: #666666;
+  background: #292929;
+}
+
+.noComments {
+  text-align: center;
+}
+
+.congratulations {
+  text-align: center;
+}
+
+#comment_form, .form-bid {
+  width: 100%;
+  height: 50px;
+  border: none;
+  border-bottom: 1px solid #ccc;
+  font-size: 16px;
+  padding-top: 10px;
+  resize: none;
+  outline: none;
+  background-color: #f2f0ea;
+  transition: height 0.3s ease, border-color 0.3s ease;
+
+}
+
+#inputs {
+  resize: none;
+  outline: none;
+  color: black;
+}
+#inputs:placeholder-shown{
+  color: lightgray;
+}
+#comment_form:focus {
+  height: 100px;
+  border-bottom: 1px solid #000;
 }
 
 .comment_section {
-  text-align: center;
-  width: 87%;
-  padding: 30px;
+  display: flex;
+  justify-content: center;
+  border-radius: 8px;
+  max-width: 100%;
+  margin-top: 8px;
 }
 
+.comment-input-container {
+  justify-content: center;
+  width: 100%;
+}
+
+div[id^="comment-area"] {
+  max-width: 400px;
+  max-height: 370px;
+  padding: 10px;     /* Fixed height to enable scrolling */
+  overflow-y: scroll;
+  border: 1px solid #ccc;
+  border-radius: 2%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
 .comment_button {
-  width: 73%;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px; 
+}
+
+
+.comment-time {
+  color: gray;
+  margin-top: auto;
+  margin-left: auto;
+  font-size: 12px;
+}
+
+.comment_button.hidden {
+  display: none;
 }
 
 #comment_button {
   display: flex;
   margin-left: auto;
+}
+.bottom-comment {
+  margin-left: auto;
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+.deleteButton {
+  margin-left: auto;
+}
+.commentTime {
+  margin-top: auto;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  margin-left: auto;
+  width: 100%;
+}
+p[id^="like_count"]{
+  padding: 5px;
+}
+
+.cancel-button, .comment_submit {
+  background-color: #f1f1f1;
+  border: none;
+  color: #333;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-left: 10px;
 
 }
 
-#close-form {
-  margin: 25px;
-  text-align: center;
-  width: 85%;
+.comment_submit {
+  background-color: black;
+  color: #fff;
+}
+
+.comment_submit:disabled {
+  background-color: lightgray;
+  border-color: lightgray;
+  cursor: default;
+}
+.comment_submit:disabled:hover {
+  background-color: lightgray;
+  border-color: lightgray;
+}
+
+.cancel-button:hover, .comment_submit:hover {
+  background-color: #ccc;
+}
+
+.comment_submit:hover {
+  background-color: #696969;
 }
 
 .closed-link {
@@ -464,14 +846,18 @@ then set the desired styles for .card-img. */
   margin-right: auto;
 }
 
+.list-group-item {
+  width: 100%;
+  text-align: center;
+}
+
 .create-button {
-  --color: #560bad;
+  --color: black;
   font-family: inherit;
   display: inline-block;
   width: 8em;
   height: 2.6em;
   line-height: 2.5em;
-  margin: 20px;
   position: relative;
   overflow: hidden;
   border: 2px solid var(--color);
@@ -509,7 +895,7 @@ then set the desired styles for .card-img. */
  }
  
  .create-button:active:before {
-  background: #3a0ca3;
+  background: black;
  }
 
  .category-button {
@@ -558,16 +944,12 @@ then set the desired styles for .card-img. */
 
 .profile_pic {
   border-radius: 100%;
-  border: solid black 3px;
-  width: 250px;
+  width: 100%;
+  height: 100%;
   margin-left: auto;
   margin-right: auto;
+  object-fit:cover;
 }
-
-.profile_picture {
-  margin: 15px;
-}
-
 .bio {
   text-align: center;
   margin: 15px;
@@ -577,8 +959,11 @@ then set the desired styles for .card-img. */
 }
 
 #bio_field {
-  border: 1px solid black;
+  border-bottom: 1px solid white;
   padding: 5px;
+  background-color: black;
+  color: lightgray;
+  outline: none;
 
 }
 
@@ -597,6 +982,7 @@ then set the desired styles for .card-img. */
 
 .followed {
   display: flex;
+  padding: 20px;
 }
 .follow-left, .follow-right {
   width: 50%;
@@ -607,13 +993,42 @@ then set the desired styles for .card-img. */
 }
 
 .edit_pfp {
-  border: 1px solid black;
   margin-left: auto;
   margin-right: auto;
+  display:block;
+  width:40px; 
+  height:40px;
+  border-radius: 100%;
+  background-color: black;
+  opacity: 70%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.edit_pfp:hover {
+  opacity: 50%;
+}
+
+.makeChanges {
+  background-color: black;
+  border: 1px solid white;
+  color: white;
+  height: 35px;
+  border-radius: 5%;
+}
+
+.fa-camera {
+  padding: 10px;
 }
 
 .edit_pfp_div {
-  text-align: center;
+  position: absolute;
+  top: 45%;
+  left: 42%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .change_picture {
@@ -623,14 +1038,43 @@ then set the desired styles for .card-img. */
 
 .comment-pic {
   border-radius: 100%;
-  width: 45px;
+  width: 100%;
+  height: 100%
+}
+
+ .navPFP, .navPfP{
+  border-radius: 100%;
+  width: 100%;
+  height: 100%;
+}
+
+.comment-left{
   border: 1px solid lightgray;
+  border-radius: 100%;
+  max-width: 45px;
+  max-height: 45px;
+  min-width: 45px;
+  min-height: 45px;
+
+}
+
+.noAuctions {
+  margin-left: auto;
+  margin-right: 50px;
+}
+
+.navPFP, .navPfP {
+  border: 1px solid lightgray;
+  border-radius: 100%;
+  width: 45px;
+  height: 45px;
 }
 
 .comment-right {
   display: flex;
   flex-direction: column;
   margin-left: 20px;
+  width: 100%;
 }
 
 .comment-user {
@@ -643,13 +1087,17 @@ then set the desired styles for .card-img. */
 
 div[class^="comment-box"] {
   display: flex;
-  padding: 20px;
-  margin-bottom: 10px;
+  width:  100%;
   animation-name: show;
   animation-duration: 1s;
   animation-fill-mode: forwards;
 }
 
+.modal-body, .modal-header,.modal-footer {
+  background-color: black;
+  color: white;
+  border: black;
+}
 .listing-user:hover {
   text-decoration: underline;
   font-weight: bold;
@@ -670,32 +1118,91 @@ div[class^="comment-box"] {
   display: flex;
 }
 
-.fa-solid {
-  margin-right: 5px;
+#profileContainer {
+  justify-content: center;
 }
 
-.delete-button {
+#profileRow {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+}
+
+.header-div {
+  width: 100%;
   margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 5px;
 }
 
 .dropdown-item{
   display: flex;
   align-items: center;
-  border: 1px solid lightgray;
   position: relative;
+  background-color: black;
+  border-bottom: 1px solid rgb(113, 118, 123);
+  color: #71767B
+}
+
+#dropdownMenu {
+  min-width: 80px; /* Set a minimum width */
+  background-color: #fff; /* Change background color if necessary */
+  border: 1px solid #ccc; /* Optional: Add border to the dropdown */
+  border-radius: 5px; /* Optional: Rounds the corners */
+  font-size: 13px;
+  color: red;
+}
+
+/* Optional: If you want to style the dropdown items as well */
+#dropdownMenu .list-group-item {
+  cursor: pointer; /* Show pointer when hovering */
+}
+
+#dropdownMenu .list-group-item:hover {
+  background-color: #f0f0f0; /* Change background on hover */
+}
+#dropdownMenu:hover{
+  background-color: #f0f0f0;
+
+}
+
+.dropdown-item:hover {
+  background-color: #2F3336;
+  color: black;
 }
 
 .dropdown-menu {
   margin-left: auto;
   margin-right: auto;
+  background-color: black;
+}
+
+.dropdown-menu-center {
+  left: 50%;
+  transform: translateX(-40%);
+}
+
+
+a[id^='noti']{
+  color: white;
+  height: 70px;
+  width: 100%;
+}
+
+a[id^='noti']:hover{
+  color: white;
 }
 
 .noti-time {
-  display: flex;
-  position: relative;
   padding-left: 10px;
 }
 
+.notiTime{
+  padding: 10px;
+}
+.noti-group {
+  padding: 40px;
+}
 .notibell {
   color: black;;
 }
@@ -709,12 +1216,37 @@ div[class^="comment-box"] {
   padding: 5px;
 }
 
+#listing-header {
+  display: inline-block;
+  white-space: nowrap;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.headerbox {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 5px;
+
+}
+
+#listingHeader {
+  margin-bottom: auto;
+  width: 100%;
+  font-size: 28px;
+}
+
+.listing-tabs {
+  display: none;
+}
 .more-noti {
   display: flex;
   align-content: center;
   justify-content: center;
   text-align: center;
   padding: 10px;
+  color: white;
+  border-bottom: rgb(113, 118, 123) 1px solid;
 }
 
 
@@ -724,9 +1256,9 @@ div[class^="comment-box"] {
 }
 
 .noti-writing {
-  padding-left: 20px;
-  padding-right: 50px;
+  margin-left: 20px;
 }
+
 
 .page-notis {
   padding: 5px;
@@ -734,9 +1266,674 @@ div[class^="comment-box"] {
 }
 
 .noti-page-list {
-  max-width: 600px; /* Adjust the max-width as needed */
+  width: 650px; /* Adjust the max-width as needed */
   margin: 0 auto; /* Center the list horizontally */
+  border: 1px solid rgb(113, 118, 123);
 }
+
+#navbarText {
+  display: none;
+}
+
+.inner-container {
+  height: 400px;
+}
+@media (max-width:580px){
+
+  .comment-input-container {
+    display: none;
+  }
+
+  #listingsRow {
+    padding-left: 10px;
+  }
+
+  .d-block, #carouselContainer, #carouselExampleIndicators {
+    height: 300px;
+  }
+
+  .alert-box {
+    top: 50%;
+    left: 35%;
+  }
+
+  #listing-header {
+   font-size: 20px;
+   padding: 5px;
+   font-weight: bold;
+  }
+  
+  .commentnhead, .image-box, .inner-container {
+    padding: 20px;
+  }
+
+  .bidForm {
+    display: none;
+  }
+
+  #header-container {
+    display: none;
+  }
+
+  #mobile-header-container {
+    order: 1;
+    display: flex;
+    width:100%;
+    justify-content: center;
+    margin-top:15px;
+  }
+
+  .nav-link {
+    color: black;
+    text-decoration: none;
+  }
+
+  .nav-link:hover{
+    color: black;
+    font-weight: bold;
+  }
+
+  .comment-right {
+    margin-left: 10px;
+    width: 70%;
+    text-align: left;
+  }
+
+  #listingHeader {
+    width: 100%;
+    display: flex;
+    padding-left: 35px;
+  }
+
+  .listingInfo {
+    width:100%;
+  }
+
+  .header-div {
+    width: 50%;
+    text-align: center;
+  }
+
+  .noti-page-list {
+    width: 325px;
+  }
+
+  #listingRow {
+    display: flex;
+    flex-direction: column;
+    padding: 0px;
+  }
+
+  .comment_button {
+   width:200px;
+   justify-content: flex-start;
+  }
+
+.comment_button.hidden{
+  border:1px solid;
+}
+
+
+  .commentnhead {
+    display: none;
+    order:5;
+    text-align: center;
+    justify-content: center;
+  }
+  
+  .inner-container {
+    width: 300px;
+    height: 190px;
+    order:4;
+    padding-bottom: 20px;
+  }
+
+  div[id^="comment-area"] {
+    min-width: 300px;
+   
+  }
+
+  .commentnhead{
+    min-width: 350px;
+  }
+
+  a[id^='noti']{
+    height: 85px;
+    width: 320px;
+  }
+
+  #dropdown-menu-noti {
+      transform: translateX(18%) translateY(3%);
+  }
+
+  .noti_listing{
+    padding: 0px;
+    margin-left: 3px;
+  }
+
+  .noti-time {
+    position: absolute;
+    bottom: 5px;  /* Position 5px from the bottom */
+    right: 5px;  /* Position 10px from the right */
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .notiTime {
+    border: 1px solid;
+    margin-left: auto;
+  }
+
+  .noti-writing{
+    display: flex;
+    flex-wrap: wrap;
+    padding: 20px;
+    font-size: 11px;
+    margin-left: 30px;
+  }
+
+  #long-writing {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100px;
+  }
+
+  #long-content {
+    border: 1px solid;
+  }
+
+  .noti-content{
+    position: relative;
+    padding:10px;
+    height: 100%;
+    width: 100%;
+  }
+
+  .navPFP {
+    position: absolute;
+    width: 45px;
+  }
+
+  .navPfP{
+    width:45px;
+  }
+
+  .navbar-toggler {
+    display: block;
+    width: 20px;
+    border: none;
+  }
+
+  .create-form {
+    width: 80%;
+  }
+
+  .profile_picture {
+    width: 170px;
+    height: 170px;
+  }
+
+  .bio {
+    text-align: center;
+    margin: 15px;
+    width:100%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .profile_headers {
+    width: 100%;
+    margin: 0px;
+    margin-top: 20px;
+  }
+
+
+  .overlay {
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1049;
+
+  }
+
+  .overlay.show {
+    display: block;
+  }
+
+  #bottom-nav {
+  width: 150px;
+  height: 50px;
+  margin-right: auto;
+  padding: 0px;
+}
+
+#navbarText {
+  position: fixed;
+  display: block;
+  top: 0;
+  left: -250px; /* Hide it off the screen */
+  width: 250px;
+  height: 100%;
+  background-color: white;
+  color: gray;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 1050;
+  padding-top: 10px;
+}
+
+#navbarText.show {
+  left: 0;
+}
+
+.navbar-dark {
+  display: none;
+}
+
+.nav-logo {
+    margin-left: 0px;
+}
+
+.container-fluid {
+  border: 1px solid;
+}
+
+#smallerRow {
+  justify-content: flex-start;
+
+}
+
+#center-header {
+  margin: 15px;
+}
+
+.lower-card {
+  padding: 0px;
+  width: 80px;
+}
+
+  .noComments {
+    text-align: center;
+    padding-left: 0px;
+  }
+
+
+  .img-container {
+    width: 80px;
+    height: 140px;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  #smaller-lower-card {
+    width: 80px;
+  }
+
+  .listingAuthor {
+    font-size: 10px;
+  }
+
+  .cardText {
+    font-size: 14px;
+  }
+
+  .comment_form {
+    width: 300px;
+    justify-content: center;
+    padding-right: 50px;
+  }
+
+  .image-box {
+    order: 2;
+    width: 300px;
+    height: 400px;
+  }
+
+  .listing-tabs { 
+      display: inline-block;
+      order:3;
+      width: 300px;
+      padding: 10px;
+  }
+
+  .listing-tabs:hover {
+    color: black;
+  }
+
+  .listing-tabs.active {
+    color: black;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  .listing-tabs:focus {
+    color: black;
+    font-weight: bold;
+    text-decoration: underline;
+  }
+  
+
+}
+@media (min-width: 1024px) and (max-width: 1500px){
+
+  .commentTime {
+     padding-left: 0px;
+     padding-bottom: 0px;
+     display: flex;
+  }
+
+  #listingsRow {
+    padding-left: 20px;
+  }
+
+  .comment-time {
+    font-size: 8px;;
+  }
+
+
+  .comment-left {
+    max-width: 35px;
+    max-height: 35px;
+    min-width: 35px;
+    min-height: 35px;
+  }
+
+  .comment-user {
+    font-size: 12px;
+  }
+
+  .comment-text {
+    font-size: 12px;
+    margin-right: auto;
+    width: 100%;
+  }
+
+  .comment-right {  
+    margin-left: 5px;
+  }
+  
+
+  .img-container {
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .input-container input {
+    width: 100%;
+  }
+
+  .navbar-dark {
+    font-size: 11px;
+  }
+
+  .noComments {
+    text-align: center;
+    padding-left: 25px;
+  }
+
+ 
+
+  #listingHeader {
+    padding-left: 20px;
+  }
+
+
+  .comment-input-container {
+    width: 270px;
+  }
+}
+
+  @media (min-width: 581px) and (max-width: 1023px){
+
+    .img-container {
+      display: flex;
+      justify-content: flex-start;
+      width: 150px;
+      height: 270px;
+    }
+
+    #smaller-lower-card {
+      width: 150px;
+    }
+
+    div[id^="comment-area"] {
+      min-width: 300px;
+     
+    }
+
+    .commentnhead{
+      min-width: 350px;
+    }
+
+    .cardText {
+      font-size: 16px;
+    }
+
+    .listingAuthor {
+      font-size: 12px;
+    }
+
+    .lower-card {
+      padding: 15px;
+      width: 200px;
+    }
+
+    #listingsRow{
+      padding-left: 10px;
+    }
+
+    .d-block, #carouselContainer, #carouselExampleIndicators {
+      height: 300px;
+    }
+
+    .commentnhead, .image-box, .inner-container {
+      padding: 20px;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1049;
+  
+    }
+  
+    .overlay.show {
+      display: block;
+    }
+
+    #navbarText {
+      position: fixed;
+      display: block;
+      top: 0;
+      left: -250px; /* Hide it off the screen */
+      width: 250px;
+      height: 100%;
+      background-color: white;
+      color: gray;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      z-index: 1050;
+      padding-top: 10px;
+    }
+    
+    #navbarText.show {
+      left: 0;
+    }
+
+    .commentnhead {
+      display: none;
+      order:5;
+      text-align: center;
+      justify-content: center;
+    }
+    
+    .comment_button {
+      width:200px;
+      justify-content: flex-start;
+      padding-left: 30px;
+     }
+   
+   .comment_button.hidden{
+     border:1px solid;
+   }
+
+   #listingHeader {
+    width: 100%;
+    display: flex;
+    padding-left: 35px;
+  }
+
+  .listingInfo {
+    margin-left: 50px;
+    width:100%;
+  }
+
+
+  .nav-link {
+    color: black;
+    text-decoration: none;
+  }
+
+  .nav-link:hover{
+    color: black;
+    font-weight: bold;
+  }
+
+  #header-container {
+    display: none;
+  }
+
+  .bidForm {
+    display: none;
+  }
+
+  .comment-input-container {
+    display: none;
+    width: 320px;
+  }
+
+  .alert-box {
+    top: 50%;
+    left: 35%;
+  }
+
+  #listing-header {
+    font-size: 20px;
+    padding: 5px;
+    font-weight: bold;
+   }
+
+  #mobile-header-container {
+    order: 1;
+    display: flex;
+    width:100%;
+    justify-content: center;
+    margin-top:15px;
+  }
+
+  .comment-right {
+    margin-left: 10px;
+    width: 70%;
+    text-align: left;
+  }
+
+  .header-div {
+    width: 50%;
+    text-align: center;
+  }
+
+    .inner-container {
+      width: 400px;
+      height: 190px;
+      order:4;
+    }
+
+    #image-container {
+      margin:0px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .noComments {
+      text-align: center;
+      padding-left: 0px;
+    }
+
+
+
+
+    .image-box {
+      order: 2;
+      min-width: 300px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    #listingRow {
+      display: flex;
+      flex-direction: column;
+      padding: 0px;
+    }
+
+
+    .listing-tabs {
+      display: inline-block;
+      order:3;
+      width: 300px;
+      padding: 10px;
+    }
+  
+    .listing-tabs:hover {
+      color: black;
+    }
+  
+    .listing-tabs.active {
+      color: black;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+  
+    .listing-tabs:focus {
+      color: black;
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+    .comment_form {
+      width: 300px;
+      justify-content: center;
+      padding-left: 40px;
+      
+    }
+  
+
+    .navbar-toggler {
+      display: block;
+      width: 20px;
+      border: none;
+    }
+
+    .navbar-dark {
+      display: none;
+    }
+  }
+
+
+
+
+
 @keyframes show {
   0% {
     opacity: 0;

@@ -1,5 +1,5 @@
 {% extends "Commerce/layout.html" %}
-{% load humanize %}
+{% load custom_filters %}
 {% block body %}
 
 <script>     
@@ -86,7 +86,8 @@
 
     function submitComment(id, comment_id) {
         const commentValue = document.querySelector("#comment_form").value;
-        let commentArea = document.querySelector(`.comment-area${id}`);
+        let commentArea = document.querySelector(`#comment-area${id}`);
+        const noComments = document.querySelector('.noComments');
         
         fetch(`/comment/${id}`, {
             method: 'POST',
@@ -100,84 +101,104 @@
         })
         .then(response => response.json())
         .then(data => {
+            if (noComments){
+                if(data.data.comments){
+                    noComments.style.display = 'none';
+                    document.querySelector('.overflow-auto').style.border = '1px solid black';
+                }
+            }
             let comment_id = data.data.comment_id;
             document.getElementById('comment_form').value = "";
             let commentBox = document.createElement('div');
-            let leftDiv = document.createElement('div');
-            let commentPic = document.createElement('img');
-            let rightDiv = document.createElement('div');
-            let commentUser = document.createElement('a');
-            let commentText = document.createElement('p');
-            let commentTime = document.createElement('p');
-            let likeArea = document.createElement('div');
-            let likeForm = document.createElement('form');
-            let likeButton = document.createElement('button');
-            let likeIcon = document.createElement('i');
-            let likeCount = document.createElement('p');
-            let deleteButton = document.createElement('button');
-            let deleteIcon = document.createElement('i');
-            
             commentBox.className = `comment-box${comment_id}`;
+
+            let leftDiv = document.createElement('div');
             leftDiv.className = "comment-left";
+            let commentPic = document.createElement('img');
             commentPic.className = "comment-pic";
+            commentPic.src = data.data.comment_pic;
+            leftDiv.appendChild(commentPic);
+
+            let rightDiv = document.createElement('div');
             rightDiv.className = "comment-right";
+            let commentUser = document.createElement('a');
             commentUser.className = "comment-user";
-            commentText.className = "comment-text";
-            commentTime.className = "comment-time";
-            likeArea.className = "like-area";
-            likeForm.className = 'like-form';
-            likeButton.className = 'like-button';
-            likeButton.type = 'button';
-            likeButton.dataset.comment = comment_id;
-            likeButton.dataset.state = 'like';
-            likeButton.id = `like_button${comment_id}`;
-            likeIcon.className = 'fa-regular fa-thumbs-up';
-            likeCount.id = `like_count${comment_id}`;
-            likeCount.innerHTML = data.data.likes;
-            deleteButton.id = `delete_button${comment_id}`;
-            deleteButton.className = 'delete-button';
-            deleteButton.type = 'button';
-            deleteButton.dataset.comment = comment_id;
-            deleteIcon.className = 'fa-regular fa-trash-can';
-            deleteIcon.style.color = " #000000;";
-            
             commentUser.href = `/profile/${data.data.user_id}`;
             commentUser.innerHTML = data.data.comment_user;
-            commentText.innerHTML = data.data.comment_comment;
-            commentTime.innerHTML = `<small>${data.data.comment_time}</small>`;
-            commentPic.src =  data.data.comment_pic;
+            rightDiv.appendChild(commentUser);
 
+            let commentText = document.createElement('p');
+            commentText.className = "comment-text";
+            commentText.innerHTML = data.data.comment_comment;
+            rightDiv.appendChild(commentText);
+
+            let likeArea = document.createElement('div');
+            likeArea.className = "like-area";
+            let likeForm = document.createElement('form');
+            likeForm.className = 'like-form';
             likeForm.action = `/like_toggle/${comment_id}/`;
             likeForm.method = 'post';
-            commentPic.style.width = "45px";
-            commentPic.style.height = "45px";
-            commentPic.style.border = "1px solid lightgray";
-            rightDiv.appendChild(commentUser);
-            rightDiv.appendChild(commentText);
             let csrfInput = document.createElement('input');
             csrfInput.type = 'hidden';
             csrfInput.name = 'csrfmiddlewaretoken';
             csrfInput.value = '{{ csrf_token }}';
-            deleteButton.appendChild(deleteIcon);
-            deleteButton.style.marginLeft = '55px';
-            deleteButton.addEventListener('click', function() {
-                deleteComment(comment_id);
-                let comment_box = deleteButton.closest(`comment-box${comment_id}`);
-
-            });
             likeForm.appendChild(csrfInput);
+
+            let likeButton = document.createElement('button');
+            likeButton.className = 'like-button';
+            likeButton.style.paddingTop = '5px';
+            likeButton.type = 'button';
+            likeButton.dataset.comment = comment_id;
+            likeButton.dataset.state = 'like';
+            likeButton.id = `like_button${comment_id}`;
+            let likeIcon = document.createElement('i');
+            likeIcon.className = 'fa-regular fa-thumbs-up';
             likeButton.appendChild(likeIcon);
             likeForm.appendChild(likeButton);
+
+
+            let likeCount = document.createElement('p');
+            likeCount.id = `like_count${comment_id}`;
+            likeCount.innerHTML = data.data.likes;
+
+
             likeArea.appendChild(likeForm);
             likeArea.appendChild(likeCount);
-            likeArea.appendChild(deleteButton);
             rightDiv.appendChild(likeArea);
-            rightDiv.appendChild(commentTime);
-            rightDiv.appendChild(commentPic);
-            leftDiv.appendChild(commentPic);
-            leftDiv.style.display = 'flex';
+
+            let bottomDiv = document.createElement('div');
+            bottomDiv.className = 'bottom-comment';
+
+            let deleteDiv = document.createElement('div');
+            deleteDiv.className = 'deleteButton';
+            let deleteButton = document.createElement('button');
+            deleteButton.id = `delete_button${comment_id}`;
+            deleteButton.className = 'delete-button';
+            deleteButton.type = 'button';
+            deleteButton.dataset.comment = comment_id;
+            let deleteIcon = document.createElement('i');
+            deleteIcon.className = 'fa-regular fa-trash-can';
+            deleteIcon.style.color = "#828282";
+            deleteButton.appendChild(deleteIcon);
+            deleteButton.addEventListener('click', function() {
+                deleteComment(comment_id);
+            });
+
+            deleteDiv.appendChild(deleteButton);
+
+            let timeDiv = document.createElement('div');
+            timeDiv.className = "commentTime";
+            let commentTime = document.createElement('p');
+            commentTime.className = "comment-time";
+            commentTime.innerHTML = `<small>${data.data.comment_time}</small>`;
+            timeDiv.appendChild(commentTime);
+
+            bottomDiv.appendChild(deleteDiv);
+            bottomDiv.appendChild(timeDiv);
+
             commentBox.appendChild(leftDiv);
             commentBox.appendChild(rightDiv);
+            commentBox.appendChild(bottomDiv);
 
             commentArea.prepend(commentBox);
 
@@ -219,6 +240,7 @@
 
 function deleteComment(id){
         let deleteButton = document.getElementById(`delete-button${id}`);
+        const noComments = document.querySelector('.noComments');
         fetch(`/delete_comment/${id}`, {
             method: 'POST',
             headers: {
@@ -230,11 +252,24 @@ function deleteComment(id){
             return response.json()
         })
         .then(data => {
+            if (noComments){
+                if(data.data.no_comments){
+                    noComments.style.display = 'block';
+                    document.querySelector('.overflow-auto').style.border = 'none';
+                }
+            }
             console.log(`comment '${data.data.comment}' deleted`);
         })
         .catch(error =>console.log('Error:', error));
 }
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function() { 
+        if(document.querySelector('.comment-left')){
+            document.querySelector('.noComments').style.display = 'none';
+            document.querySelector('.overflow-auto').style.border = '1px solid #ccc';
+        } else {
+            document.querySelector('.noComments').style.display = 'block';
+            document.querySelector('.overflow-auto').style.border = 'none';
+        }
         const likeButtons = document.querySelectorAll('.like-button');
         likeButtons.forEach(button => {
             button.addEventListener('click', function() {
@@ -256,7 +291,9 @@ function deleteComment(id){
             button.addEventListener('click', function(event){
                 event.preventDefault();
                 let listingId = button.getAttribute('data-listing');
-                submitComment(listingId);                     
+                submitComment(listingId); 
+                document.querySelector('.noComments').style.display = 'none';  
+                document.querySelector('.overflow-auto').style.border = '1px solid #ccc';                
             })
         })
         const wishButtons = document.querySelectorAll('[id^="wish-button"]');
@@ -268,177 +305,405 @@ function deleteComment(id){
                     addWishlist(profileId);
                     button.setAttribute('data-wishlist', 'wished');
                     button.innerHTML = '<i class="fa-solid fa-heart" style="color: black;"></i>';
+                    showAlert('Added to wishlist');
                 } else if (currentState === 'wished') {
                     removeWishlist(profileId);
                     button.setAttribute('data-wishlist', 'wish');
                     button.innerHTML = '<i class="fa-regular fa-heart" style="color: black;"></i>';
+                    showAlert('Removed from wishlist');
                 }
-            });
+            function showAlert(message) {
+                const alertBox = document.createElement('div');
+                alertBox.className = `alert-box`;
+                alertBox.textContent = message;
+
+                document.body.appendChild(alertBox);
+
+                // Show the alert box
+                setTimeout(() => {
+                    alertBox.style.opacity = '1';
+                }, 100);
+
+                // Hide the alert box after 3 seconds
+                setTimeout(() => {
+                    alertBox.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(alertBox);
+                    }, 500);
+                }, 1000);
+             }
         });
+            
+        const commentInput = document.querySelector('#comment_form');
+        const submitButton = document.querySelector('.comment_submit');
+        const cancelButton = document.querySelector('.cancel-button');
+        const commentButtons = document.querySelector('.comment_button');
+
+        commentInput.addEventListener('input', function() {
+            submitButton.disabled = commentInput.value.trim() === '';
+        });
+
+         commentInput.addEventListener('focus', function () {
+            commentButtons.classList.remove('hidden');
+            commentInput.style.height = '100px';
+        });
+
+        cancelButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            commentInput.value = '';
+            submitButton.disabled = true;
+            commentButtons.classList.add('hidden');
+            commentInput.style.height = '50px';
+            commentInput.blur();
+        });
+
+        submitButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            // Handle comment submission logic here
+            submitButton.disabled = true;
+            commentInput.value = '';
+            commentButtons.classList.add('hidden');
+            commentInput.style.height = '50px';
+            commentInput.blur();
+        });
+
+        submitButton.disabled = true;
+        commentButtons.classList.add('hidden');;
+    });
         const deleteButtons = document.querySelectorAll('.delete-button');
         deleteButtons.forEach(button => {
             button.addEventListener('click', function(event) {
                 let commentId = button.getAttribute('data-comment');
-                deleteComment(commentId); 
                 let comment = button.closest(`.comment-box${commentId}`);
+                deleteComment(commentId); 
                 comment.style.animationName = 'hide';
                 comment.style.animationDuration = '.8s';
                 comment.style.animationFillMode = 'forwards';
                 comment.style.animationPLayState = 'running';
                 comment.addEventListener('animationend', function(){
-                    comment.remove();
+                    comment.remove();              
                 })
             });
         });
-    
+
+        const detailTab = document.querySelector('#details');
+        const reviewTab = document.querySelector('#reviews');
+        const bidTab = document.querySelector('#bids');
+        const mobileHeader = document.querySelector('#mobile-header-container');
+        const commentSection = document.querySelector('.commentnhead');
+        const bidSection = document.querySelector('.bidForm');
+        const commentForm = document.querySelector('.comment-input-container');
+        const infoSection = document.querySelector('.listingInfo');
+        const innerContainer = document.querySelector('.inner-container');
+        const listingTabs = document.querySelectorAll('.listing-tabs');
+        const bidFormBlock = document.querySelector('.bidFormBlock');
+        detailTab.classList.add('active');
+        const error = document.querySelector('.error');
+
+        function handleMobileEvents() {
+            const width = window.innerWidth;        
+            if (width <= 1023) {
+                // Add event listeners for mobile view
+                detailTab.addEventListener('click', showDetails);
+                reviewTab.addEventListener('click', showReviews);
+                bidTab.addEventListener('click', showBids);
+                if (error){
+                    showBids();
+                } else {
+                    showDetails();
+                }
+            } else {
+                // Remove event listeners when switching to desktop view
+                detailTab.removeEventListener('click', showDetails);
+                reviewTab.removeEventListener('click', showReviews);
+                bidTab.removeEventListener('click', showBids);
+                
+                // Optionally, reset any styles or states here for desktop view
+                resetToDesktopView();
+            }
+        }
+
+        function showDetails() {
+            commentSection.style.display = 'none';
+            bidSection.style.display = 'none';
+            commentForm.style.display = 'none';
+            infoSection.style.display = 'block';
+            innerContainer.style.display = 'block';
+            bidFormBlock.style.display = 'none';
+            if (error){
+                error.style.display ='none';
+            }
+            reviewTab.classList.remove('active');
+            detailTab.classList.add('active');
+            bidTab.classList.remove('active');
+        }
+
+        function showReviews() {
+            commentSection.style.display = 'block';
+            bidSection.style.display = 'none';
+            commentForm.style.display = 'block';
+            infoSection.style.display = 'none';
+            innerContainer.style.display = 'block';
+            if(bidFormBlock){
+                bidFormBlock.style.display = 'none';
+            }
+            if (error){
+                error.style.display ='none';
+            }
+            reviewTab.classList.add('active');
+            detailTab.classList.remove('active');
+            bidTab.classList.remove('active');
+        }
+
+        function showBids() {
+            commentSection.style.display = 'none';
+            bidSection.style.display = 'block';
+            commentForm.style.display = 'none';
+            infoSection.style.display = 'none';
+            innerContainer.style.display = 'none';
+            bidFormBlock.style.display = 'block';
+            if (error){
+                error.style.display ='block';
+            }
+            reviewTab.classList.remove('active');
+            detailTab.classList.remove('active');
+            bidTab.classList.add('active');
+        }
+
+        function resetToDesktopView() {
+            // Reset any styles or states that need to revert for desktop view
+            commentSection.style.display = '';
+            bidSection.style.display = '';
+            commentForm.style.display = '';
+            infoSection.style.display = '';
+            innerContainer.style.display = '';
+            bidFormBlock.style.display = '';
+            if (error){
+                error.style.display ='';
+            }
+        }
+
+        // Run on initial load
+        handleMobileEvents();
+
+        // Listen for window resize and apply styles accordingly
+        window.addEventListener('resize', handleMobileEvents);
     });
 
 </script>
 {% for listing in listings %}
-    <div id="image-container">
-            <div class = "image-box">
-                <div class="imgBack"></div>
-                <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
-            </div>
-            <div class="inner-container">
-                <div id="header-container">
-                    <div class="headerbox">
-                        <h1 class="header">{{ listing.listing_name }}</h1>
-                    </div>
-                    <div class="watch-button">
-                        {% if user.is_authenticated %}
-                            {% if request.user.profile in listing.listing_wishlist.all and listing.listing_closed == False %}
-                                <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
-                                    <i class="fa-solid fa-heart" style="color: black;"></i>
-                                </button>
-                            {% else %}
-                                <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
-                                    <i class="fa-regular fa-heart" style="color: black;"></i>
-                                </button>
-                            {% endif %}
-                        {% endif %}
-                    </div>
-                </div>
-                {% if listing.bidding_count == 0 %}
-                    <p id="price" class="header">$ {{ listing.listing_price }}.00</p>
-                {% else %}
-                    <p id="price" class="header">$ {{ listing.listing_bid_price }}.00</p>
-                {% endif %}
-                <p>{{ listing.bidding_count }} bid(s) on this item.</p>
-                <p>{{ listing.listing_description }}</p>
-                <p>Category: {{ listing.listing_category }}</p>
-                <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> {{ listing.listing_date|naturaltime }}</small>
-            </div>
-    </div>
     {% if user.is_authenticated %}
         {% if listing.listing_bid_winner == request.user.profile and listing.listing_closed == True %}
-            <h3>Congrats {{ listing.listing_bid_winner }}!, you've won this item.</h3>
+            <div class="alert alert-success" role="alert">
+                <h3 class="congratulations">Congrats {{ listing.listing_bid_winner }}! You've won this item.</h3>
+            </div>
         {% endif %}
+    {% endif %}
+    <div id="listingContainer" class="container">
+        <div id="listingRow" class="row">
+            <div class="commentnhead">
+                <div class="header-div">
+                    <h1 id="listingHeader" class="header">Reviews</h1>
+                </div>
+                <div data-listing="{{listing.id}}" class="overflow-auto" id="comment-area{{listing.id}}">
+                    {% if listing.listing_closed == False %}
+                        <p class="noComments">No comments yet</p>
+                    {% else %}
+                        <p class="noComments">No comments to display</p>
+                    {% endif %}
+                    {% for comment in comments %}
+                        <div class="comment-box{{comment.id}}">
+                            <div class="comment-left">
+                                {% if comment.comment_user.profile_pic %}
+                                    <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
+                                {% else %}
+                                    <img class="comment-pic" src="../media/images/default_profile.png" alt="{{ comment.comment_user }}">
+                                {% endif %}
+                            </div>
+                            <div class="comment-right">
+                                <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
+                                <p class="comment-text">{{ comment.comment_comment }}</p>
+                                <div class="like-area">
+                                    {% if user.is_authenticated %}
+                                        {% if request.user.profile in comment.comment_likes.all %}
+                                                <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
+                                                    <i class="fa-solid fa-thumbs-up"></i>
+                                                </button>
+                                        {% else %}
+                                                <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
+                                                    <i class="fa-regular fa-thumbs-up"></i>
+                                                </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <form action="{% url 'logout' %}" method="post">
+                                            {% csrf_token %}
+                                            <button  type="submit">
+                                                <i class="fa-regular fa-thumbs-up"></i>
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p>   
+                                </div>
+                            </div> 
+                            <div class="bottom-comment">
+                                <div class="deleteButton">
+                                    <button id="delete_button{{comment.id}}" class="delete-button" type="button" data-comment="{{comment.id}}">
+                                                <i class="fa-regular fa-trash-can" style="color: #828282;"></i>
+                                    </button>
+                                </div>
+                                <div class="commentTime">  
+                                    <p class="comment-time"><small>{{ comment.comment_time|simple_naturaltime }}</small></p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div id="mobile-header-container">
+                <div class="headerbox">
+                    <h1 id="listing-header" class="header">{{ listing.listing_name }}</h1>
+                </div>
+                <div class="watch-button">
+                    {% if user.is_authenticated and listing.listing_closed == False  %}
+                        {% if request.user.profile in listing.listing_wishlist.all %}
+                            <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                                <i class="fa-solid fa-heart" style="color: black;"></i>
+                            </button>
+                        {% else %}
+                            <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                                <i class="fa-regular fa-heart" style="color: black;"></i>
+                            </button>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+                <div class = "image-box">
+                    <img class="image-view" src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}">
+                    {% if listing.listing_user == request.user.profile and listing.listing_closed == False %}
+                    <div id="meatball-menu" class="btn-group dropup">
+                        <button type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fa-solid fa-ellipsis"></i>
+                        </button>
+                        <div id="dropdownMenu" class="dropdown-menu">
+                            <li class="list-group-item" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                Close Listing
+                            </li>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                    <!-- Modal -->
+                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you sure?</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <h3>This action cannot be undone.</h3>
+                            </div>
+                            <div class="modal-footer">
+                                <div>
+                                    <form name="close" action="" method="post">
+                                        {% csrf_token %}
+                                        <button name="close" class="btn btn-danger" type="submit">Yes</button>
+                                    </form>
+                                </div>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            </div>
+                        </div>
+                        </div>
+                    </div>
+                    <div class="listing-tabs">
+                        <ul class="nav nav-underline">
+                            <li class="nav-item">
+                            <a id="details" class="nav-link" aria-current="page" href="#">Details</a>
+                            </li>
+                            <li class="nav-item">
+                        {%  if listing.listing_closed == False %}
+                            <a id="reviews" class="nav-link" href="#">Reviews</a>
+                            </li>
+                            <li class="nav-item">
+                            <a id="bids" class="nav-link" href="#">Bid</a>
+                            </li>
+                        </ul>
+                        {% endif %}
+                    </div>
+                <div class="inner-container">
+                    <div id="header-container">
+                        <div class="headerbox">
+                            <h1 id="listing-header" class="header">{{ listing.listing_name }}</h1>
+                        </div>
+                        <div class="watch-button">
+                            {% if user.is_authenticated and listing.listing_closed == False  %}
+                                {% if request.user.profile in listing.listing_wishlist.all %}
+                                    <button id="wish-button{{request.user.profile.id}}" name="remove_wishlist" type="submit" class="btn btn-light" data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wished">
+                                        <i class="fa-solid fa-heart" style="color: black;"></i>
+                                    </button>
+                                {% else %}
+                                    <button id="wish-button{{request.user.profile.id}}" name="add_wishlist" type="submit" class="btn btn-light"  data-profile="{{request.user.profile.id}}" data-listing="{{listing.id}}" data-wishlist="wish">
+                                        <i class="fa-regular fa-heart" style="color: black;"></i>
+                                    </button>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="listingInfo">
+                        {% if listing.bidding_count == 0 %}
+                            <p id="price" class="header">$ {{ listing.listing_price }}.00</p>
+                        {% else %}
+                            <p id="price" class="header">$ {{ listing.listing_bid_price }}.00</p>
+                        {% endif %}
+                        <p>{{ listing.bidding_count }} bid(s) on this item.</p>
+                        <p>{{ listing.listing_description }}</p>
+                        <p>Category: {{ listing.listing_category }}</p>
+                        <small>Posted by <a class="listing-user" href="{% url 'profile' profile_id=listing.listing_user.user.id  %}">{{ listing.listing_user }}</a> {{ listing.listing_date|simple_naturaltime }}</small>
+                    </div>
+                    {% if user.is_authenticated %}
+                    {% if listing.listing_closed == False %}
+                            <div class="comment-input-container">
+                                <form class="comment_form" name='comment' action="" method="post">
+                                    {% csrf_token %}
+                                    {{ formy }}
+                                </form>
+                                <div class="comment_button hidden">
+                                    <button class="cancel-button">Cancel</button>
+                                    <button name="comment" id="comment_button{{listing.id}}" class="comment_submit" data-listing="{{listing.id}}" type="submit">Comment</button>
+                                </div>
+                            </div>
+                    {% endif %}
+                    {% endif %}
+                </div>
+        </div>
+    </div>
+    <!--the listing tabs stop working at 501px width, find out why-->
+    {% if user.is_authenticated %}
         {% if listing.listing_closed == False %}
+            <div class="bidFormBlock">
+                {% if listing.bidding_count == 0 %}
+                    <p>Current Price: {{ listing.listing_price }}.00</p>
+                {% else %}
+                    <p>Current Price: {{ listing.listing_bid_price }}.00</p>
+                {% endif %}
+                <p>{{ listing.bidding_count }} bid(s) on this item.</p>
+            </div>
             {% if errors.firstBid %}
                 <p class="error">{{ errors.firstBid }}</p>
             {% endif %}
             {% if errors.otherBid %}
                 <p class="error">{{ errors.otherBid }}</p>
             {% endif %}
-        <form class="form-container" name="bid" action="" method="post">
-                {% csrf_token %}
-                <span>$</span>{{ form }}<span>.00</span>
-                <div class="input-group-append">
-                    <button name="bid" class="input-add-on" type="submit">Bid</button>
-                </div>
-        </form>
+            <div class="bidForm">
+                <form class="form-container" name="bid" action="" method="post">
+                        {% csrf_token %}
+                        <p class="bid-price">$</p>{{ form }}
+                        <button name="bid" class="boton-elegante" type="submit">
+                                Bid
+                        </button>
+                </form>
+            </div>
         {% endif %}
     {% endif %}
-    {% if user.is_authenticated %}
-    {% if listing.listing_closed == False %}
-    <div class="comment_section">
-        <form class="comment_form" name='comment' action="" method="post">
-            {% csrf_token %}
-            {{ formy }}
-            <div class="comment_button">
-                <button name="comment" id="comment_button{{listing.id}}" class="comment_submit" data-listing="{{listing.id}}" type="submit">Comment</button>
-            </div>
-        </form>
-    {% endif %}
-    </div>
-    {% endif %}
-    <h1>Comments</h1>
-    <div class="comment-area{{listing.id}}">
-        {% for comment in comments %}
-            <div class="comment-box{{comment.id}}">
-                <div class="comment-left">
-                    {% if comment.comment_user.profile_pic %}
-                        <img class="comment-pic" src="{{ comment.comment_user.profile_pic.url }}" alt="{{ comment.comment_user }}">
-                    {% else %}
-                        <img class="comment-pic" src="../media/images/default_profile.png" alt="{{ comment.comment_user }}">
-                    {% endif %}
-                </div>
-                <div class="comment-right">
-                    <a href="{% url 'profile' profile_id=comment.comment_user.user.id %}" class="comment-user">{{ comment.comment_user }}</a>
-                    <p class="comment-text">{{ comment.comment_comment }}</p>
-                    <div class="like-area">
-                        {% if user.is_authenticated %}
-                            {% if request.user.profile in comment.comment_likes.all %}
-                                    <button id="unlike_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="unlike">
-                                        <i class="fa-solid fa-thumbs-up"></i>
-                                    </button>
-                            {% else %}
-                                    <button id="like_button{{comment.id}}" class="like-button" type="button" data-comment="{{comment.id}}" data-state="like">
-                                        <i class="fa-regular fa-thumbs-up"></i>
-                                    </button>
-                            {% endif %}
-                        {% else %}
-                            <form action="{% url 'logout' %}" method="post">
-                                {% csrf_token %}
-                                <button  type="submit">
-                                    <i class="fa-regular fa-thumbs-up"></i>
-                                </button>
-                            </form>
-                        {% endif %}
-                        <p id="like_count{{comment.id}}">{{ comment.comment_likes.all|length }}</p> 
-                        <button id="delete_button{{comment.id}}" class="delete-button" type="button" data-comment="{{comment.id}}">
-                            <i class="fa-regular fa-trash-can" style="color: #000000;"></i>
-                        </button>      
-                    </div>
-                    <p class="comment-time"><small>{{ comment.comment_time|naturaltime }}</small></p>
-                </div>
-            </div>
-        {% empty %}
-        <p>No comments yet</p>
-        {% endfor %}
-    </div>
-    {% if listing.listing_user == request.user.profile and listing.listing_closed == False %}
-        <div id="close-form">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                Close Listing
-            </button>
-        </div>
-    {% endif %}
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Are you sure?</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h3>This action cannot be undone.</h3>
-            </div>
-            <div class="modal-footer">
-                <div>
-                    <form name="close" action="" method="post">
-                        {% csrf_token %}
-                        <button name="close" class="btn btn-danger" type="submit">Yes</button>
-                    </form>
-                </div>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            </div>
-        </div>
-        </div>
-    </div>
-
 {% endfor %}
-
 {% endblock %}

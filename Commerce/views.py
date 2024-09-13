@@ -50,9 +50,11 @@ def noti_change(request, noti_id):
 def noti_page(request):
      active_notif = Notifications.objects.filter(noti_user=request.user.profile).all()
      button_disabled = True
+     noti_page = True
      return render(request, 'Commerce/notifications.html', {
           'notifs': active_notif,
-          'button_disabled': button_disabled
+          'button_disabled': button_disabled,
+          'noti_page': noti_page
      })
 
 def profile(request, profile_id):
@@ -63,19 +65,11 @@ def profile(request, profile_id):
      following = profile_user.followed_by.all
 
      if request.method == 'POST':
-          if 'profile_pic' in request.FILES:
-               editprofileform = EditProfileForm(request.FILES)
-               if editprofileform.is_valid():
-                    profile_pic_file = request.FILES['profile_pic']
-                    profile_user.profile_pic = profile_pic_file
-                    profile_user.save()
-          elif 'bio' in request.POST:
-               editprofileform = EditProfileForm(request.POST)
-               if editprofileform.is_valid():
-                    bio = editprofileform.cleaned_data['bio']
-                    profile_user.bio = bio
-                    profile_user.save()           
-          return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+        # Use request.FILES and request.POST together
+        form = EditProfileForm(request.POST, request.FILES, instance=profile_user)
+        if form.is_valid():
+            form.save()
+            return redirect(request.META.get('HTTP_REFERER'))
      else:
           editprofileform = EditProfileForm(instance=profile_user)
           profile = Profile.objects.get(user_id=profile_id)
@@ -294,28 +288,31 @@ def unlike_toggle(request, comment_id):
 def delete_comment(request, comment_id):
      if request.method == "POST":
           comments = Comments.objects.get(id=comment_id)
+          commentListing = comments.comment_listing
           comments.delete()
-          return JsonResponse({"data": {"comment": comments.comment_comment}})
+          comment_count = Comments.objects.filter(comment_listing=commentListing).count()
+          no_comments = comment_count == 0
+          return JsonResponse({"data": {"comment": comments.comment_comment, "no_comments":no_comments}})
      
 def add_wish(request, user_id):
-     if request.method == "POST":
-          data = json.loads(request.body)
-          listing_id = (data["listingId"])
-          listing = Listing.objects.get(id=listing_id)
-          user = Profile.objects.get(id=user_id)
-          listing.listing_wishlist.add(user)
-          listing.save()
-          return JsonResponse({"data": {"user":request.user.username}})
+          if request.method == "POST":
+               data = json.loads(request.body)
+               listing_id = (data["listingId"])
+               listing = Listing.objects.get(id=listing_id)
+               user = Profile.objects.get(id=user_id)
+               listing.listing_wishlist.add(user)
+               listing.save()
+               return JsonResponse({"data": {"user":request.user.username}})
 
 def remove_wish(request, user_id):
-     if request.method == "POST":
-          data = json.loads(request.body)
-          listing_id = (data["listingId"])
-          listing = Listing.objects.get(id=listing_id)
-          user = Profile.objects.get(id=user_id)
-          listing.listing_wishlist.remove(user)
-          listing.save()
-          return JsonResponse({"data": {"user":request.user.username}})
+          if request.method == "POST":
+               data = json.loads(request.body)
+               listing_id = (data["listingId"])
+               listing = Listing.objects.get(id=listing_id)
+               user = Profile.objects.get(id=user_id)
+               listing.listing_wishlist.remove(user)
+               listing.save()
+               return JsonResponse({"data": {"user":request.user.username}})
 
 
 def wishlist(request):

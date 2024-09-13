@@ -1,26 +1,34 @@
 {% extends "Commerce/layout.html" %}
 
 {% block body %}
-    <h1 class="header">Wishlist</h1>
-    <div class="row row-cols-1 row-cols-md-5 g-1 m-5">
-    {% for wish in wishes %}
-    <div class="col">
-        <div class="card h-100">
-            <div class="card-img"><div class="img"><img src="{{ wish.listing_image.url }}" alt="{{wish.listing_name}}"></div></div>
-            <div class="card-title">{{ wish.listing_name }}</div>
-            <div class="card-subtitle">{{ wish.listing_description }}</div>
-            <hr class="card-divider">
-            <div class="card-footer">
-                <div class="card-price">
-                    {% if wish.listing_bid_price is none %}
-                        <h5 class="card-title">$ {{ wish.listing_price }}</h5>
-                    {% else %}
-                        <h5 class="card-title">$ {{ wish.listing_bid_price }}</h5>
-                    {% endif %}
-                </div>
-                <a href="{% url 'listing' listing_id=wish.id %}"><button class="card-btn">View</button></a>
+<h1 id="center-header" class="header">Wishlist</h1>
+<div id="listingsContainer" class="container">
+    <div id="listingsRow" class="row">
+    {% for listing in wishes %}
+    <div class="col-4 col-sm-4 col-md-4 col-lg-3 mb-4">
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div class="img-container">
+                <div class="img-background"></div>
+                <div class="prodimg"><img src="{{ listing.listing_image.url }}" alt="{{listing.listing_name}}"></div>
+        </a>
             </div>
-        </div>
+        <a href="{% url 'listing' listing_id=listing.id %}">
+            <div class="lower-card">
+                <div class="titleCard">
+                    <p class="cardText">{{ listing.listing_name }}</p>
+                </div>
+                <small class="listingAuthor">Listed by {{ listing.listing_user }}</small>
+                    <div class="priceCard">
+                        {% if listing.listing_bid_price is none %}
+                            <p class="cardText">$ {{ listing.listing_price }}</p>
+                        {% else %}
+                            <p class="cardText">$ {{ listing.listing_bid_price }}</p>
+                        {% endif %}
+                    </div>
+            </div>
+        </a>                          
     </div>
-    {% endfor %}
+{% endfor %}
+</div>
+</div>
 {% endblock %}
